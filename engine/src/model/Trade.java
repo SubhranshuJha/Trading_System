@@ -41,4 +41,8 @@ public class Trade {
     public int getQuantity() {
         return quantity;
     }
+
+    public int getTotalValue() {
+        return price * quantity;
+    }
 }

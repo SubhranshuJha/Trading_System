@@ -151,7 +151,8 @@ public class EngineHttpServer {
                 + "\"sellOrderId\":\"" + escapeJson(trade.getSellOrderId()) + "\","
                 + "\"symbol\":\"" + escapeJson(trade.getSymbol()) + "\","
                 + "\"price\":" + trade.getPrice() + ","
-                + "\"quantity\":" + trade.getQuantity()
+                + "\"quantity\":" + trade.getQuantity() + ","
+                + "\"totalValue\":" + trade.getTotalValue()
                 + "}";
     }
 
