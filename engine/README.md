@@ -1,17 +1,26 @@
-# 🚀 Trading Engine (Order Matching System)
+# 🚀 Trading Engine (Java Order Matching System)
 
-A high-performance **limit order matching engine** built in Java that simulates the core functionality of a stock exchange.
+A lightweight **limit order matching engine** built in Java with an embedded HTTP server.
+It simulates core exchange functionality including **order placement, matching, trade execution, and order book management**.
 
 ---
 
 ## 📌 Overview
 
-This project implements a **price-time priority based matching engine** that:
+This system allows users to:
 
-* Accepts BUY and SELL orders
-* Matches them based on price
-* Executes trades
-* Maintains an order book
+* Place BUY and SELL orders
+* Automatically match orders using **price-time priority**
+* Execute trades
+* View real-time order book
+
+---
+
+## 🏗️ Architecture
+
+```text
+Client → HTTP Server → ExchangeService → OrderBook → Matching Engine → Trade
+```
 
 ---
 
@@ -19,9 +28,9 @@ This project implements a **price-time priority based matching engine** that:
 
 ### 🧾 Order
 
-Represents a user order.
+Represents a trading request.
 
-```
+```text
 id, symbol, userId, type (BUY/SELL), category (LIMIT), price, quantity
 ```
 
@@ -29,92 +38,64 @@ id, symbol, userId, type (BUY/SELL), category (LIMIT), price, quantity
 
 ### 📚 OrderBook
 
-Maintains active orders:
+Maintains orders per symbol:
 
-* **Buy Orders** → sorted in **descending order (highest price first)**
-* **Sell Orders** → sorted in **ascending order (lowest price first)**
+* BUY orders → sorted **descending (highest price first)**
+* SELL orders → sorted **ascending (lowest price first)**
 
-```
-BUY  → TreeMap (descending)
-SELL → TreeMap (ascending)
+Uses:
+
+```text
+TreeMap<Integer, Queue<Order>>
 ```
 
-Each price level stores:
-
-```
-Queue<Order> → ensures FIFO (time priority)
-```
+* TreeMap → price priority
+* Queue → FIFO (time priority)
 
 ---
 
 ### 🔄 Matching Engine
 
-Handles order execution:
+Implements:
 
-* BUY matches lowest SELL
-* SELL matches highest BUY
-* Supports partial fills
+* BUY matches lowest SELL ≤ price
+* SELL matches highest BUY ≥ price
+* Partial order execution
 * Removes completed orders
 
 ---
 
 ### 💰 Trade
 
-Represents executed transactions:
+Represents executed trades:
 
-```
-tradeId, buyOrderId, sellOrderId, symbol, price, quantity
-```
-
----
-
-## 🧠 Matching Logic
-
-### ✅ BUY Order
-
-Matches with **lowest SELL price ≤ buy price**
-
-### ✅ SELL Order
-
-Matches with **highest BUY price ≥ sell price**
-
----
-
-## 🔥 Example Flow
-
-### Step 1: Place Orders
-
-```
-BUY  → 10 @ 100
-SELL → 5 @ 90
-```
-
----
-
-### Step 2: Matching
-
-```
-Trade executed:
-5 units @ 90
-```
-
----
-
-### Step 3: Result
-
-```
-Remaining:
-BUY → 5 @ 100
-SELL → empty
+```text
+tradeId, buyOrderId, sellOrderId, symbol, price, quantity, totalValue
 ```
 
 ---
 
 ## 📡 API Endpoints
 
+### 🟢 Health Check
+
+```http
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
 ### ▶️ Place Order
 
-```
+```http
 POST /orders
 ```
 
@@ -132,11 +113,30 @@ POST /orders
 }
 ```
 
+#### Response:
+
+```json
+{
+  "remainingQuantity": 5,
+  "trades": [
+    {
+      "id": "t1",
+      "buyOrderId": "1",
+      "sellOrderId": "2",
+      "symbol": "TATA",
+      "price": 100,
+      "quantity": 5,
+      "totalValue": 500
+    }
+  ]
+}
+```
+
 ---
 
 ### 📊 Get OrderBook
 
-```
+```http
 GET /orderbook?symbol=TATA
 ```
 
@@ -147,8 +147,10 @@ GET /orderbook?symbol=TATA
   "symbol": "TATA",
   "buy": [
     {
+      "id": "1",
+      "userId": "u1",
       "price": 100,
-      "totalQuantity": 5
+      "quantity": 5
     }
   ],
   "sell": []
@@ -157,20 +159,31 @@ GET /orderbook?symbol=TATA
 
 ---
 
-### 🔄 Trade Response (on match)
+## 🔥 Example Flow
 
-```json
-{
-  "trades": [
-    {
-      "tradeId": "t1",
-      "buyOrderId": "1",
-      "sellOrderId": "2",
-      "price": 100,
-      "quantity": 5
-    }
-  ]
-}
+### Step 1: Place Orders
+
+```text
+BUY  → 10 @ 100
+SELL → 5 @ 90
+```
+
+---
+
+### Step 2: Matching
+
+```text
+Trade executed:
+5 units @ 90
+```
+
+---
+
+### Step 3: Result
+
+```text
+Remaining BUY → 5 @ 100
+SELL → empty
 ```
 
 ---
@@ -178,67 +191,70 @@ GET /orderbook?symbol=TATA
 ## ⚡ Key Features
 
 * ✅ Price-Time Priority Matching
-* ✅ Partial Order Execution
-* ✅ FIFO within same price level
+* ✅ FIFO execution within same price
+* ✅ Partial fills supported
 * ✅ Efficient data structures (TreeMap + Queue)
-* ✅ Clean modular design
+* ✅ Lightweight HTTP server (no heavy frameworks)
 
 ---
 
-## 🏗️ Architecture
+## 🧩 Data Structures
 
-```
-User → Order → OrderBook → Matching Engine → Trade
-```
-
----
-
-## 🧩 Data Structures Used
-
-| Component            | Structure | Reason              |
-| -------------------- | --------- | ------------------- |
-| OrderBook            | TreeMap   | Sorted price levels |
-| Orders at same price | Queue     | FIFO execution      |
-| Matching             | Iteration | Efficient traversal |
+| Component | Structure | Purpose             |
+| --------- | --------- | ------------------- |
+| OrderBook | TreeMap   | Sorted price levels |
+| Orders    | Queue     | FIFO execution      |
+| Matching  | Iteration | Efficient traversal |
 
 ---
 
-## 🚀 Future Improvements
+## 🚀 How to Run
 
-* Market Orders
-* Stop Loss Orders
-* Persistent Storage (DB)
-* Concurrency handling
-* WebSocket live updates
-* Balance + Ledger system
-
----
-
-## 🧠 Interview Insights
-
-This project demonstrates:
-
-* System Design thinking
-* Efficient data structures
-* Real-world trading logic
-* Clean separation of concerns
-
----
-
-## 📌 How to Run
+### 1. Compile
 
 ```bash
-# Start server
-mvn spring-boot:run
+javac *.java
+```
 
-# Place order
+---
+
+### 2. Run Server
+
+```bash
+java EngineHttpServer
+```
+
+Server starts at:
+
+```text
+http://localhost:8080
+```
+
+---
+
+### 3. Test APIs
+
+#### Place Order
+
+```bash
 curl.exe -X POST http://localhost:8080/orders \
 -H "Content-Type: application/json" \
 -d "{\"id\":\"1\",\"symbol\":\"TATA\",\"userId\":\"u1\",\"type\":\"BUY\",\"category\":\"LIMIT\",\"price\":100,\"quantity\":10}"
+```
 
-# Check orderbook
+---
+
+#### Get OrderBook
+
+```bash
 curl.exe "http://localhost:8080/orderbook?symbol=TATA"
 ```
 
 ---
+
+## 🧠 Design Highlights
+
+* Separation of concerns (Order, Trade, OrderBook, Engine)
+* Efficient matching using sorted maps
+* Stateless HTTP interface over in-memory engine
 
