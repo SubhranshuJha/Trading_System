@@ -1,38 +1,124 @@
-# Trading Engine (Java)
+# 🚀 Trading Engine (Order Matching System)
 
-This folder contains the Java matching engine and an HTTP entry-point server so Node can send requests to it.
+A high-performance **limit order matching engine** built in Java that simulates the core functionality of a stock exchange.
 
-## Run The Engine Server
+---
 
-From `d:\Trading_System`:
+## 📌 Overview
 
-```powershell
-javac -d engine\out (Get-ChildItem -Recurse engine\src\*.java | Where-Object { $_.Name -ne 'Main.java' } | ForEach-Object { $_.FullName })
-java -cp engine\out EngineHttpServer 8080
+This project implements a **price-time priority based matching engine** that:
+
+* Accepts BUY and SELL orders
+* Matches them based on price
+* Executes trades
+* Maintains an order book
+
+---
+
+## ⚙️ Core Components
+
+### 🧾 Order
+
+Represents a user order.
+
+```
+id, symbol, userId, type (BUY/SELL), category (LIMIT), price, quantity
 ```
 
-If you do not pass a port, default is `8080`.
+---
 
-## API Endpoints
+### 📚 OrderBook
 
-### 1) Health
+Maintains active orders:
 
-- Method: `GET`
-- URL: `http://localhost:8080/health`
+* **Buy Orders** → sorted in **descending order (highest price first)**
+* **Sell Orders** → sorted in **ascending order (lowest price first)**
 
-Response:
-
-```json
-{"status":"ok"}
+```
+BUY  → TreeMap (descending)
+SELL → TreeMap (ascending)
 ```
 
-### 2) Place Order
+Each price level stores:
 
-- Method: `POST`
-- URL: `http://localhost:8080/orders`
-- Content-Type: `application/json`
+```
+Queue<Order> → ensures FIFO (time priority)
+```
 
-Request body:
+---
+
+### 🔄 Matching Engine
+
+Handles order execution:
+
+* BUY matches lowest SELL
+* SELL matches highest BUY
+* Supports partial fills
+* Removes completed orders
+
+---
+
+### 💰 Trade
+
+Represents executed transactions:
+
+```
+tradeId, buyOrderId, sellOrderId, symbol, price, quantity
+```
+
+---
+
+## 🧠 Matching Logic
+
+### ✅ BUY Order
+
+Matches with **lowest SELL price ≤ buy price**
+
+### ✅ SELL Order
+
+Matches with **highest BUY price ≥ sell price**
+
+---
+
+## 🔥 Example Flow
+
+### Step 1: Place Orders
+
+```
+BUY  → 10 @ 100
+SELL → 5 @ 90
+```
+
+---
+
+### Step 2: Matching
+
+```
+Trade executed:
+5 units @ 90
+```
+
+---
+
+### Step 3: Result
+
+```
+Remaining:
+BUY → 5 @ 100
+SELL → empty
+```
+
+---
+
+## 📡 API Endpoints
+
+### ▶️ Place Order
+
+```
+POST /orders
+```
+
+#### Request:
 
 ```json
 {
@@ -46,62 +132,113 @@ Request body:
 }
 ```
 
-Rules:
+---
 
-- `type`: `BUY` or `SELL`
-- `category`: `LIMIT` or `MARKET`
-- `price` and `quantity` must be integers
+### 📊 Get OrderBook
 
-Response includes:
+```
+GET /orderbook?symbol=TATA
+```
 
-- `remainingQuantity`: quantity left after matching
-- `trades`: list of executed trades
-
-### 3) Get OrderBook
-
-- Method: `GET`
-- URL: `http://localhost:8080/orderbook?symbol=TATA`
-
-Response:
+#### Response:
 
 ```json
 {
   "symbol": "TATA",
   "buy": [
-    {"id":"1","userId":"u1","price":100,"quantity":5}
+    {
+      "price": 100,
+      "totalQuantity": 5
+    }
   ],
   "sell": []
 }
 ```
 
-## Node.js Usage Example
+---
 
-```js
-const place = await fetch("http://localhost:8080/orders", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    id: "1",
-    symbol: "TATA",
-    userId: "u1",
-    type: "BUY",
-    category: "LIMIT",
-    price: 100,
-    quantity: 10
-  })
-});
+### 🔄 Trade Response (on match)
 
-console.log(await place.json());
-
-const book = await fetch("http://localhost:8080/orderbook?symbol=TATA");
-console.log(await book.json());
+```json
+{
+  "trades": [
+    {
+      "tradeId": "t1",
+      "buyOrderId": "1",
+      "sellOrderId": "2",
+      "price": 100,
+      "quantity": 5
+    }
+  ]
+}
 ```
 
-## Quick Curl Test
+---
+
+## ⚡ Key Features
+
+* ✅ Price-Time Priority Matching
+* ✅ Partial Order Execution
+* ✅ FIFO within same price level
+* ✅ Efficient data structures (TreeMap + Queue)
+* ✅ Clean modular design
+
+---
+
+## 🏗️ Architecture
+
+```
+User → Order → OrderBook → Matching Engine → Trade
+```
+
+---
+
+## 🧩 Data Structures Used
+
+| Component            | Structure | Reason              |
+| -------------------- | --------- | ------------------- |
+| OrderBook            | TreeMap   | Sorted price levels |
+| Orders at same price | Queue     | FIFO execution      |
+| Matching             | Iteration | Efficient traversal |
+
+---
+
+## 🚀 Future Improvements
+
+* Market Orders
+* Stop Loss Orders
+* Persistent Storage (DB)
+* Concurrency handling
+* WebSocket live updates
+* Balance + Ledger system
+
+---
+
+## 🧠 Interview Insights
+
+This project demonstrates:
+
+* System Design thinking
+* Efficient data structures
+* Real-world trading logic
+* Clean separation of concerns
+
+---
+
+## 📌 How to Run
 
 ```bash
-curl http://localhost:8080/health
-curl -X POST http://localhost:8080/orders -H "Content-Type: application/json" -d "{\"id\":\"1\",\"symbol\":\"TATA\",\"userId\":\"u1\",\"type\":\"BUY\",\"category\":\"LIMIT\",\"price\":100,\"quantity\":10}"
-curl "http://localhost:8080/orderbook?symbol=TATA"
+# Start server
+mvn spring-boot:run
+
+# Place order
+curl.exe -X POST http://localhost:8080/orders \
+-H "Content-Type: application/json" \
+-d "{\"id\":\"1\",\"symbol\":\"TATA\",\"userId\":\"u1\",\"type\":\"BUY\",\"category\":\"LIMIT\",\"price\":100,\"quantity\":10}"
+
+# Check orderbook
+curl.exe "http://localhost:8080/orderbook?symbol=TATA"
 ```
+
+---
 
