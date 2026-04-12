@@ -2,7 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import 'dotenv/config';
-import connectDB from './config/connectDB';
+import connectDB from './config/connectDB.js';
+import authRouter from './routes/auth.route.js';
 
 
 const app = express();
@@ -21,8 +22,12 @@ app.get( '/' , (req,res) => {
 // connect to database
 connectDB() ;
 
+
+// Routes 
+app.use("/api/auth", authRouter) ;
+
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on port http://localhost:${port}`);
 }) ;
 
 export default app ;

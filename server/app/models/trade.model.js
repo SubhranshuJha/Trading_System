@@ -48,5 +48,5 @@ const tradeSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-const trade = mongoose.model('Trade', tradeSchema);
-export default trade;
+const tradeModel = mongoose.model('Trade', tradeSchema);
+export default tradeModel;

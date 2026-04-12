@@ -11,5 +11,5 @@ const stockSchema = new mongoose.Schema({
 
 } , { timestamps: true });
 
-const stock = mongoose.model('Stock', stockSchema);
-export default stock;
+const stockModel = mongoose.model('Stock', stockSchema);
+export default stockModel;
