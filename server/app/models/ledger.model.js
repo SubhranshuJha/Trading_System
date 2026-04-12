@@ -9,7 +9,9 @@ const ledgerSchema = new mongoose.Schema({
     index: true
   },
 
-  symbol: String,
+  symbol: {
+      type: String,
+  },
 
   quantity: Number,
 

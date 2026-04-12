@@ -20,6 +20,12 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
 
+  catogory: {
+    type: String,
+    enum: ["LIMIT", "MARKET"],
+    required: true
+  },
+
   price: {
     type: Number,
     required: true
@@ -27,7 +33,7 @@ const orderSchema = new mongoose.Schema({
 
   quantity: {
     type: Number,
-    required: true
+    min: 1,
   },
 
   remainingQty: {
