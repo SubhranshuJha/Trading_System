@@ -21,7 +21,12 @@ const portfolioSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0
-      } 
+      },
+
+      locked: {
+        type: Number,
+        default: 0
+      }
     }
   ]
 
