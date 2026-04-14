@@ -7,7 +7,6 @@ public class LimitOrder implements OrderHandler {
 
     @Override
     public List<Trade> handle(Order order, OrderBook orderBook) {
-        List<Trade> trades = new ArrayList<>();
 
         if (order.getType() == OrderType.BUY) {
             return matchBuy(order, orderBook.getSellOrders());
