@@ -2,8 +2,10 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import 'dotenv/config';
+
 import connectDB from './config/connectDB.js';
 import authRouter from './routes/auth.route.js';
+import stockRouter from './routes/stock.route.js';
 
 
 const app = express();
@@ -25,6 +27,7 @@ connectDB() ;
 
 // Routes 
 app.use("/api/auth", authRouter) ;
+app.use("/api/stock", stockRouter) ;
 
 app.listen(port, () => {
     console.log(`Server is running on port http://localhost:${port}`);
