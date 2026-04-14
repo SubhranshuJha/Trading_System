@@ -34,7 +34,7 @@ const ledgerSchema = new mongoose.Schema({
   },
 
   referenceId: {
-    type: mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId 
   },
 
   referenceModel: {
