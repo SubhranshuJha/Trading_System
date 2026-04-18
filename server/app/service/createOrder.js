@@ -94,9 +94,9 @@ export const createOrder = async (data) => {
 
         // get the res form the java engine
         const response = await sendToJavaEngine(order);
-const trades = response.trades;
+        const trades = response.trades;
         console.log("Trades:", trades);
-console.log("Type:", typeof trades);
+        console.log("Type:", typeof trades);
 
         if (!trades || trades.length === 0) {
             await session.commitTransaction();
@@ -204,6 +204,16 @@ console.log("Type:", typeof trades);
                 referenceModel: "Trade"
             }]);
         }
+
+        // update the stock price with the last trade price
+        const lastTrade = trades[trades.length - 1];
+
+        await stockModel.findByIdAndUpdate(
+            stockBySymbol._id,
+            { currentPrice: lastTrade.price }
+
+        );
+
 
         // unloack the remaining amount or stock for the order if not completely filled and update the order status accordingly
         const remainingQty = order.quantity - totalFilled;
