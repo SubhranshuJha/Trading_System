@@ -3,7 +3,7 @@ import stockModel from "../models/stock.model.js";
 import bidModel from "../models/bid.model.js";
 import { closeIPOInternal } from "../services/ipo.service.js";
 
-export const createIPO = async (req, res) => {
+const createIPO = async (req, res) => {
     try {
         const { stockId, totalShares, priceBand, startDate, endDate, lotSize } = req.body;
 
@@ -53,7 +53,7 @@ export const createIPO = async (req, res) => {
 };
 
 
-export const placeBid = async (req, res) => {
+const placeBid = async (req, res) => {
     try {
         const { quantity, bidPrice } = req.body;
         const ipoId = req.params.id;
@@ -96,7 +96,7 @@ export const placeBid = async (req, res) => {
 };
 
 // manula close the ipo if any prblm  occurs in automatic closing by scheduler
-export const closeIPO = async (req, res) => {
+const closeIPO = async (req, res) => {
     try {
         const result = await closeIPOInternal(req.params.id);
 
@@ -110,3 +110,27 @@ export const closeIPO = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+const getALLIPOs = async (req, res) => {
+    try {
+        const ipos = await ipoModel.find().populate("stockId").sort({ createdAt: -1 });
+
+        res.json({ success: true, ipos });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+const getIPOBySymbol = async (req, res) => {
+    try {
+        const ipo = await ipoModel.findOne({ symbol: req.params.symbol }).populate("stockId");
+        if (!ipo) {
+            return res.status(404).json({ message: "IPO not found" });
+        }
+        res.json({ success: true, ipo });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+export { createIPO, placeBid, closeIPO, getALLIPOs, getIPOBySymbol };
