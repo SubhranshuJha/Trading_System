@@ -1,12 +1,14 @@
-import stockModel from "../models/stock.model";
+import stockModel from "../models/stock.model.js";
 
 const createStock = async (req , res ) => {
     
     try {
 
-        const { name , symbol , quantity , currentPrice } = req.body ;
+        const { name  , quantity , currentPrice } = req.body ;
+        let { symbol } = req.body ;
+        symbol = symbol.toUpperCase();
 
-        if ( !name || !symbol || !quantity || !currentPrice ) {
+        if ( !name || !symbol || !quantity  ) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 

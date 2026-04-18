@@ -15,12 +15,12 @@ public class LimitOrder implements OrderHandler {
         }
     }
 
-    private List<Trade> matchBuy(Order order, TreeMap<Integer, Queue<Order>> sellOrders) {
+    private List<Trade> matchBuy(Order order, TreeMap<Double, Queue<Order>> sellOrders) {
         List<Trade> trades = new ArrayList<>();
-        List<Integer> pricesToRemove = new ArrayList<>();
+        List<Double> pricesToRemove = new ArrayList<>();
 
-        for (Map.Entry<Integer, Queue<Order>> entry : sellOrders.entrySet()) {
-            int price = entry.getKey();
+        for (Map.Entry<Double, Queue<Order>> entry : sellOrders.entrySet()) {
+            double price = entry.getKey();
 
             // Limit buy can only match at or below its limit price.
             if (price > order.getPrice()) {
@@ -58,18 +58,18 @@ public class LimitOrder implements OrderHandler {
             }
         }
 
-        for (Integer price : pricesToRemove) {
+        for (Double price : pricesToRemove) {
             sellOrders.remove(price);
         }
         return trades;
     }
 
-    private List<Trade> matchSell(Order order, TreeMap<Integer, Queue<Order>> buyOrders) {
+    private List<Trade> matchSell(Order order, TreeMap<Double, Queue<Order>> buyOrders) {
         List<Trade> trades = new ArrayList<>();
-        List<Integer> pricesToRemove = new ArrayList<>();
+        List<Double> pricesToRemove = new ArrayList<>();
 
-        for (Map.Entry<Integer, Queue<Order>> entry : buyOrders.entrySet()) {
-            int price = entry.getKey();
+        for (Map.Entry<Double, Queue<Order>> entry : buyOrders.entrySet()) {
+            double price = entry.getKey();
 
             // Limit sell can only match at or above its limit price.
             if (price < order.getPrice()) {
@@ -107,7 +107,7 @@ public class LimitOrder implements OrderHandler {
             }
         }
 
-        for (Integer price : pricesToRemove) {
+        for (Double price : pricesToRemove) {
             buyOrders.remove(price);
         }
         return trades;

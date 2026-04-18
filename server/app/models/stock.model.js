@@ -5,7 +5,7 @@ const stockSchema = new mongoose.Schema({
     name : { type: String, required: true, unique: true },
     symbol : { type: String, required: true, unique: true },
     quantity : { type: Number, required: true },
-    currentPrice : { type: Number, required: true },
+    currentPrice : { type: Number },
     isActive : { type: Boolean, default: true },
     createdAt : { type: Date, default: Date.now },
 

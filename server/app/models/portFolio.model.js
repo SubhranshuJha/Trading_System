@@ -11,6 +11,10 @@ const portfolioSchema = new mongoose.Schema({
 
   stocks: [
     {
+      symbol: {
+        type: String
+      },
+
       stockId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Stock",

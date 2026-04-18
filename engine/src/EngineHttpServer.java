@@ -74,7 +74,7 @@ public class EngineHttpServer {
                         payload.get("userId"),
                         OrderType.valueOf(payload.get("type").toUpperCase(Locale.ROOT)),
                         OrderCategory.valueOf(payload.get("category").toUpperCase(Locale.ROOT)),
-                        Integer.parseInt(payload.get("price")),
+                        Double.parseDouble(payload.get("price")),
                         Integer.parseInt(payload.get("quantity"))
                 );
 
@@ -88,7 +88,7 @@ public class EngineHttpServer {
                 response.append("]}");
                 writeJson(exchange, 200, response.toString());
             } catch (NumberFormatException ex) {
-                writeJson(exchange, 400, "{\"error\":\"price and quantity must be integers\"}");
+                writeJson(exchange, 400, "{\"error\":\"price must be a valid number and quantity must be an integer\"}");
             } catch (IllegalArgumentException ex) {
                 writeJson(exchange, 400, "{\"error\":\"Invalid enum values for type/category\"}");
             } catch (Exception ex) {
@@ -125,10 +125,10 @@ public class EngineHttpServer {
         }
     }
 
-    private static String sideToJson(TreeMap<Integer, Queue<Order>> side) {
+    private static String sideToJson(TreeMap<Double, Queue<Order>> side) {
         StringBuilder sb = new StringBuilder("[");
         boolean firstOrder = true;
-        for (Map.Entry<Integer, Queue<Order>> entry : side.entrySet()) {
+        for (Map.Entry<Double, Queue<Order>> entry : side.entrySet()) {
             for (Order order : entry.getValue()) {
                 if (!firstOrder) sb.append(",");
                 firstOrder = false;

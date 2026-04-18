@@ -24,7 +24,7 @@ const ledgerSchema = new mongoose.Schema({
 
   type: {
     type: String,
-    enum: ["DEPOSIT", "WITHDRAW", "BUY", "SELL", "LOCK", "UNLOCK"],
+    enum: ["DEPOSIT", "WITHDRAW", "BUY", "SELL", "LOCK", "UNLOCK" , "FUND"],
     required: true
   },
 

@@ -8,10 +8,10 @@ public class Order {
     private String userId;
     private OrderType type ;
     private OrderCategory catogery;
-    private int price;
+    private double price;
     private int quantity;
 
-    public Order(String id, String symbol, String userId, OrderType type, OrderCategory catogery, int price, int quantity) {
+    public Order(String id, String symbol, String userId, OrderType type, OrderCategory catogery, double price, int quantity) {
         this.id = id;
         this.symbol = symbol;
         this.userId = userId;
@@ -36,7 +36,7 @@ public class Order {
     public OrderCategory getCatogery() {
         return catogery;
     }
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
     public int getQuantity() {

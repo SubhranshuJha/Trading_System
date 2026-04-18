@@ -1,5 +1,5 @@
 import express from 'express';
-import { createStock } from '../controllers/stock.controller.js';
+import { createStock , getAllStocks , getStockBySymbol } from '../controllers/stock.controller.js';
 
 const stockRouter = express.Router();
 

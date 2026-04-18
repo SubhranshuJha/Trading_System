@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
 
-  catogory: {
+  category : {
     type: String,
     enum: ["LIMIT", "MARKET"],
     required: true
@@ -43,7 +43,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["OPEN", "PARTIAL", "FILLED", "CANCELLED"],
+    enum: ["OPEN", "PARTIAL", "COMPLETED", "CANCELLED"],
     default: "OPEN"
   }
 

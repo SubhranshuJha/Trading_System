@@ -6,10 +6,10 @@ import model.Order;
 
 public class OrderBook {
 
-    private TreeMap<Integer, Queue<Order>> buyOrders =
+    private TreeMap<Double, Queue<Order>> buyOrders =
             new TreeMap<>(Collections.reverseOrder());
 
-    private TreeMap<Integer, Queue<Order>> sellOrders =
+    private TreeMap<Double, Queue<Order>> sellOrders =
             new TreeMap<>();
     
     public void addOrder(Order order) {
@@ -22,24 +22,24 @@ public class OrderBook {
         }
     }
 
-    public TreeMap<Integer, Queue<Order>> getBuyOrders() {
+    public TreeMap<Double, Queue<Order>> getBuyOrders() {
         return buyOrders;
     }
 
-    public TreeMap<Integer, Queue<Order>> getSellOrders() {
+    public TreeMap<Double, Queue<Order>> getSellOrders() {
         return sellOrders;
     }
 
     public void printOrderBook() {
         System.out.println("BUY Orders:");
-        for (Map.Entry<Integer, Queue<Order>> entry : buyOrders.entrySet()) {
+        for (Map.Entry<Double, Queue<Order>> entry : buyOrders.entrySet()) {
             for (Order order : entry.getValue()) {
                 System.out.println(order.getId() + " - " + order.getUserId() + " - " + order.getQuantity() + " @ " + order.getPrice());
             }
         }
 
         System.out.println("SELL Orders:");
-        for (Map.Entry<Integer, Queue<Order>> entry : sellOrders.entrySet()) {
+        for (Map.Entry<Double, Queue<Order>> entry : sellOrders.entrySet()) {
             for (Order order : entry.getValue()) {
                 System.out.println(order.getId() + " - " + order.getUserId() + " - " + order.getQuantity() + " @ " + order.getPrice());
             }

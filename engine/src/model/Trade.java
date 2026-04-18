@@ -6,10 +6,10 @@ public class Trade {
     private String buyOrderId; 
     private String sellOrderId;
     private String symbol;
-    private int price;
+    private double price;
     private int quantity;
 
-    public Trade(String id, String buyOrderId, String sellOrderId, String symbol, int price, int quantity) {
+    public Trade(String id, String buyOrderId, String sellOrderId, String symbol, double price, int quantity) {
         this.id = id;
         this.buyOrderId = buyOrderId;
         this.sellOrderId = sellOrderId;
@@ -34,7 +34,7 @@ public class Trade {
         return symbol;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -42,7 +42,7 @@ public class Trade {
         return quantity;
     }
 
-    public int getTotalValue() {
+    public double getTotalValue() {
         return price * quantity;
     }
 }

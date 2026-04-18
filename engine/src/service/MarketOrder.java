@@ -13,12 +13,12 @@ public class MarketOrder implements OrderHandler {
         return matchSell(order, orderBook.getBuyOrders());
     }
 
-    private List<Trade> matchBuy(Order buyOrder, TreeMap<Integer, Queue<Order>> sellOrders) {
+    private List<Trade> matchBuy(Order buyOrder, TreeMap<Double, Queue<Order>> sellOrders) {
         List<Trade> trades = new ArrayList<>();
-        List<Integer> pricesToRemove = new ArrayList<>();
+        List<Double> pricesToRemove = new ArrayList<>();
 
-        for (Map.Entry<Integer, Queue<Order>> entry : sellOrders.entrySet()) {
-            int price = entry.getKey();
+        for (Map.Entry<Double, Queue<Order>> entry : sellOrders.entrySet()) {
+            double price = entry.getKey();
             Queue<Order> queue = entry.getValue();
 
             while (!queue.isEmpty() && buyOrder.getQuantity() > 0) {
@@ -44,18 +44,18 @@ public class MarketOrder implements OrderHandler {
             if (buyOrder.getQuantity() == 0) break;
         }
 
-        for (Integer price : pricesToRemove) {
+        for (Double price : pricesToRemove) {
             sellOrders.remove(price);
         }
         return trades;
     }
 
-    private List<Trade> matchSell(Order sellOrder, TreeMap<Integer, Queue<Order>> buyOrders) {
+    private List<Trade> matchSell(Order sellOrder, TreeMap<Double, Queue<Order>> buyOrders) {
         List<Trade> trades = new ArrayList<>();
-        List<Integer> pricesToRemove = new ArrayList<>();
+        List<Double> pricesToRemove = new ArrayList<>();
 
-        for (Map.Entry<Integer, Queue<Order>> entry : buyOrders.entrySet()) {
-            int price = entry.getKey();
+        for (Map.Entry<Double, Queue<Order>> entry : buyOrders.entrySet()) {
+            double price = entry.getKey();
             Queue<Order> queue = entry.getValue();
 
             while (!queue.isEmpty() && sellOrder.getQuantity() > 0) {
@@ -81,7 +81,7 @@ public class MarketOrder implements OrderHandler {
             if (sellOrder.getQuantity() == 0) break;
         }
 
-        for ( Integer price : pricesToRemove) {
+        for ( Double price : pricesToRemove) {
             buyOrders.remove(price);
         }
         return trades;
