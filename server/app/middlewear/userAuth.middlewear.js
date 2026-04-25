@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import userModel from '../models/user.model.js';
 import blackListToken from '../models/blackListToken.model.js';
 
-const authMiddleware = async (req, res, next) => {
+const userAuthMiddleware = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
@@ -50,4 +50,4 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-export default authMiddleware;
+export default userAuthMiddleware;

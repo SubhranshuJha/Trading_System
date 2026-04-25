@@ -1,6 +1,6 @@
 import express from 'express';
 import { placeBuyOrder, placeSellOrder } from '../controllers/order.controller.js';
-import authMiddleware from '../middlewear/auth.middlewear.js';
+import authMiddleware from '../middlewear/userAuth.middlewear.js';
 
 const orderRouter = express.Router();
 

@@ -3,8 +3,8 @@ import ledgerModel from "../models/ledger.model.js";
 const addFund = async (req, res) => {
   try {
     const userId = req.id;
-    const { amount } = req.body;
-    if (!amount || amount <= 0) {
+    const amount = Number(req.body.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
       return res.status(400).json({
         success: false,
         message: "Unable to add funds ! Amount is required.",
@@ -23,7 +23,7 @@ const addFund = async (req, res) => {
     // get the last ledger entry to calculate the new balance
     const lastLedger = await ledgerModel
       .findOne({ userId })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1, _id: -1 });
     newLedgerData.balanceAfter = lastLedger
       ? lastLedger.balanceAfter + amount
       : amount;

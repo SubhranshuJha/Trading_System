@@ -1,8 +1,8 @@
-import userModel from "../models/user.model";
-import orderModel from "../models/order.model";
-import tradeModel from "../models/trade.model";
-import ledgerModel from "../models/ledger.model";
-import portfolioModel from "../models/portFolio.model";
+import userModel from "../models/user.model.js";
+import orderModel from "../models/order.model.js";
+import tradeModel from "../models/trade.model.js";
+import ledgerModel from "../models/ledger.model.js";
+import portfolioModel from "../models/portFolio.model.js";
 
 const getUserProfile = async (req, res) => {
   try {
@@ -78,7 +78,7 @@ const getUserBalance = async (req, res) => {
 
     const lastLedger = await ledgerModel
       .findOne({ userId })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1, _id: -1 });
     const currentBalance = lastLedger ? lastLedger.balanceAfter : 0;
 
     return res.status(200).json({

@@ -13,7 +13,7 @@ export const createOrder = async (data) => {
 
     try {
 
-        const stockBySymbol = await stockModel.findOne({ symbol: data.symbol });
+        const stockBySymbol = await stockModel.findOne({ symbol: data.symbol }).session(session);
         if (!stockBySymbol) {
             throw new Error("Stock not found");
         }
@@ -29,14 +29,15 @@ export const createOrder = async (data) => {
         const orderArr = await orderModel.create([{
             ...data,
             status: "OPEN"
-        }]);
+        }], { session });
 
         const order = orderArr[0];
 
         // get the balance of the user form the last ledger entry
         const lastLedger = await ledgerModel
             .findOne({ userId: data.userId })
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1, _id: -1 })
+            .session(session);
 
         const currentBalance = lastLedger ? lastLedger.balanceAfter : 0;
 
@@ -57,12 +58,12 @@ export const createOrder = async (data) => {
                 balanceAfter: currentBalance - lockAmount,
                 referenceId: order._id,
                 referenceModel: "Order"
-            }]);
+            }], { session });
 
         } else {
 
             //  get the user portfolio and check whether the user has sufficient stock to sell and lock the stock
-            let portfolio = await portfolioModel.findOne({ userId: data.userId });
+            let portfolio = await portfolioModel.findOne({ userId: data.userId }).session(session);
 
             if (!portfolio) throw new Error("Portfolio not found");
 
@@ -77,7 +78,7 @@ export const createOrder = async (data) => {
             stock.quantity -= order.quantity;
             stock.locked = (stock.locked || 0) + order.quantity;
 
-            await portfolio.save();
+            await portfolio.save({ session });
 
             // ledger entry (optional tracking)
             await ledgerModel.create([{
@@ -89,7 +90,7 @@ export const createOrder = async (data) => {
                 balanceAfter: currentBalance,
                 referenceId: order._id,
                 referenceModel: "Order"
-            }]);
+            }], { session });
         }
 
         // get the res form the java engine
@@ -128,7 +129,7 @@ export const createOrder = async (data) => {
                 quantity: trade.quantity,
                 symbol: trade.symbol,
                 totalAmount: tradeAmount
-            }]);
+            }], { session });
 
             const tradeId = tradeDoc[0]._id;
 
@@ -155,23 +156,31 @@ export const createOrder = async (data) => {
 
             buyerStock.quantity += trade.quantity;
 
-            await buyerPortfolio.save();
+            await buyerPortfolio.save({ session });
 
             // update seller portfolio (deduct locked stock)
             let sellerPortfolio = await portfolioModel.findOne({ userId: sellerId }).session(session);
+            if (!sellerPortfolio) {
+                throw new Error("Seller portfolio not found");
+            }
 
             const sellerStock = sellerPortfolio.stocks.find(
                 isTargetStock
             );
+            if (!sellerStock) {
+                throw new Error("Seller stock not found in portfolio");
+            }
 
             sellerStock.locked -= trade.quantity;
 
-            await sellerPortfolio.save();  
+            await sellerPortfolio.save({ session });  
 
             // update the ledgers of buyer and seller
             const buyerLast = await ledgerModel
                 .findOne({ userId: buyerId })
-                .sort({ createdAt: -1 });
+                .sort({ createdAt: -1, _id: -1 })
+                .session(session);
+            const buyerBalance = buyerLast ? buyerLast.balanceAfter : 0;
 
             await ledgerModel.create([{
                 userId: buyerId,
@@ -180,17 +189,18 @@ export const createOrder = async (data) => {
                 quantity: trade.quantity,
                 price: trade.price,
                 amount: tradeAmount,
-                balanceAfter: buyerLast.balanceAfter,
+                balanceAfter: buyerBalance,
                 referenceId: tradeId,
                 referenceModel: "Trade"
-            }]);
+            }], { session });
 
             // update the seller ledger (add amount)
             const sellerLast = await ledgerModel
                 .findOne({ userId: sellerId })
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: -1, _id: -1 })
+                .session(session)
 
-            const sellerBalance = sellerLast.balanceAfter + tradeAmount;
+            const sellerBalance = (sellerLast ? sellerLast.balanceAfter : 0) + tradeAmount;
 
             await ledgerModel.create([{
                 userId: sellerId,
@@ -202,7 +212,7 @@ export const createOrder = async (data) => {
                 balanceAfter: sellerBalance,
                 referenceId: tradeId,
                 referenceModel: "Trade"
-            }]);
+            }], { session });
         }
 
         // update the stock price with the last trade price
@@ -211,7 +221,8 @@ export const createOrder = async (data) => {
         await stockModel.findByIdAndUpdate(
             stockBySymbol._id,
             { currentPrice: lastTrade.price }
-
+            ,
+            { session }
         );
 
 
@@ -220,23 +231,30 @@ export const createOrder = async (data) => {
 
         if (remainingQty > 0 && data.type === "SELL") {
 
-            const portfolio = await portfolioModel.findOne({ userId: order.userId });
+            const portfolio = await portfolioModel.findOne({ userId: order.userId }).session(session);
+            if (!portfolio) {
+                throw new Error("Portfolio not found");
+            }
 
             const stock = portfolio.stocks.find(
                 isTargetStock
             );
+            if (!stock) {
+                throw new Error("Stock not found in portfolio");
+            }
 
             stock.locked -= remainingQty;
             stock.quantity += remainingQty;
 
-            await portfolio.save();
+            await portfolio.save({ session });
         }
 
         if (remainingQty > 0 && data.type === "BUY") {
 
             const lastLedgerAfter = await ledgerModel
                 .findOne({ userId: order.userId })
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: -1, _id: -1 })
+                .session(session)
 
             const unlockAmount = remainingQty * order.price;
 
@@ -245,17 +263,17 @@ export const createOrder = async (data) => {
                 type: "UNLOCK",
                 symbol: order.symbol,
                 amount: unlockAmount,
-                balanceAfter: lastLedgerAfter.balanceAfter + unlockAmount,
+                balanceAfter: (lastLedgerAfter ? lastLedgerAfter.balanceAfter : 0) + unlockAmount,
                 referenceId: order._id,
                 referenceModel: "Order"
-            }]);
+            }], { session });
         }
 
         // update order status and remaining quantity
         order.remainingQty = remainingQty;
         order.status = remainingQty === 0 ? "COMPLETED" : "PARTIAL";
 
-        await order.save();
+        await order.save({ session });
 
         await session.commitTransaction();
         session.endSession();

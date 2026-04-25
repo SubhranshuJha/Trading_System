@@ -39,7 +39,7 @@ const ledgerSchema = new mongoose.Schema({
 
   referenceModel: {
     type: String,
-    enum: ["Order", "Trade"]
+    enum: ["Order", "Trade", "Bid", "IPO" , "IPO_SELL"],
   }
 
 }, { timestamps: true });

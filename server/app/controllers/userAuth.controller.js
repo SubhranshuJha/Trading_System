@@ -10,7 +10,7 @@ const registerUser = async (req, res) => {
     
     try {
 
-        const { email , name , password } = req.body;
+        const { email , name , password , type } = req.body;
 
         if ( !email || !name || !password ) {
             return res.status(400).json ( {
@@ -45,6 +45,7 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const userData = new userModel ( { email, name, password: hashedPassword } );
+        userData.type = type === "COMPANY" ? "COMPANY" : "USER"; 
         await userData.save();
 
         return res.status(201).json ( {

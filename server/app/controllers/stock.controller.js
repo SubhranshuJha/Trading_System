@@ -1,13 +1,15 @@
+import companyModel from "../models/componey.model.js";
 import stockModel from "../models/stock.model.js";
 
 const createStock = async (req , res ) => {
     
     try {
 
-        const { name  , quantity , currentPrice } = req.body ;
-        let { symbol } = req.body ;
-        symbol = symbol.toUpperCase();
-
+        const { name  , quantity  } = req.body ;
+        const companyId = req.id;
+        
+        const company = await companyModel.findById(companyId);
+ 
         if ( !name || !symbol || !quantity  ) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
@@ -19,9 +21,8 @@ const createStock = async (req , res ) => {
 
         const newStockData = {
             name,
-            symbol,
-            quantity,
-            currentPrice
+            symbol: company.symbol,
+            quantity
         }
 
         const newStock = await stockModel.create(newStockData);

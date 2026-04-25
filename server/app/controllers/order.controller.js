@@ -5,9 +5,12 @@ const placeBuyOrder = async (req, res) => {
     try {
 
         const userId = req.id ;
-        const { stockSymbol, quantity, price , category } = req.body;
+        const stockSymbol = req.body.stockSymbol?.toUpperCase();
+        const quantity = Number(req.body.quantity);
+        const price = Number(req.body.price);
+        const { category } = req.body;
 
-        if ( !stockSymbol || !quantity || !price || !category ) {
+        if ( !stockSymbol || !category || !Number.isFinite(quantity) || !Number.isFinite(price) ) {
             return res.status(400).json ( {
                 success: false,
                 message: "Unable to place buy order ! All fields are required."    
@@ -48,9 +51,10 @@ const placeBuyOrder = async (req, res) => {
         
     } catch (error) {
         console.log("ISE > ", error);
-        return res.status(500).json ( {
+        const status = error.message === "Insufficient balance" || error.message === "Stock not found" ? 400 : 500;
+        return res.status(status).json ( {
             success: false,
-            message: "Unable to place buy order ! Something went wrong."    
+            message: status === 400 ? error.message : "Unable to place buy order ! Something went wrong."    
             })
     }  
 }
@@ -60,9 +64,12 @@ const placeSellOrder = async (req, res) => {
         try {
 
         const userId = req.id ;
-        const { stockSymbol, quantity, price , category } = req.body;
+        const stockSymbol = req.body.stockSymbol?.toUpperCase();
+        const quantity = Number(req.body.quantity);
+        const price = Number(req.body.price);
+        const { category } = req.body;
 
-        if ( !stockSymbol || !quantity || !price || !category ) {
+        if ( !stockSymbol || !category || !Number.isFinite(quantity) || !Number.isFinite(price) ) {
             return res.status(400).json ( {
                 success: false,
                 message: "Unable to place sell order ! All fields are required."    
@@ -102,9 +109,10 @@ const placeSellOrder = async (req, res) => {
 
     } catch (error) {
         console.log("ISE > ", error);
-        return res.status(500).json ( {
+        const status = error.message === "Insufficient stock" || error.message === "Portfolio not found" || error.message === "Stock not found" ? 400 : 500;
+        return res.status(status).json ( {
             success: false,
-            message: "Unable to place sell order ! Something went wrong."    
+            message: status === 400 ? error.message : "Unable to place sell order ! Something went wrong."    
             })
     }  
 }
