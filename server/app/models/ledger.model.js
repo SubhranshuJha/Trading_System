@@ -5,9 +5,13 @@ const ledgerSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
     index: true
   },
+
+  companyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company"
+  } ,
 
   symbol: {
       type: String,
@@ -24,7 +28,7 @@ const ledgerSchema = new mongoose.Schema({
 
   type: {
     type: String,
-    enum: ["DEPOSIT", "WITHDRAW", "BUY", "SELL", "LOCK", "UNLOCK" , "FUND"],
+    enum: ["DEPOSIT", "WITHDRAW", "BUY", "SELL", "LOCK", "UNLOCK" , "FUND" , "IPO_SELL"],
     required: true
   },
 

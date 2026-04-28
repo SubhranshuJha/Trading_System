@@ -3,10 +3,15 @@ import stockModel from "../models/stock.model.js";
 import bidModel from "../models/bid.model.js";
 import ledgerModel from "../models/ledger.model.js";
 import { closeIPOInternal } from "../service/closeIPOInternal.js";
+import companyAuthMiddleware from '../middlewear/companyAuth.middlewear.js';
 import mongoose from "mongoose";
 
 const createIPO = async (req, res) => {
     try {
+
+        console.log("companyAuthMiddleware:", typeof companyAuthMiddleware);
+        
+        
         const { stockId, totalShares, startDate, endDate, lotSize } = req.body;
         const priceRange = req.body.priceRange || req.body.priceBand;
 
@@ -58,7 +63,8 @@ const createIPO = async (req, res) => {
         res.status(201).json({ success: true, ipo });
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.log("ISE > CREATE IPO:", err.message);
+        res.status(500).json({ "ISE > CREATE IPO": err.message });
     }
 };
 
@@ -178,6 +184,7 @@ const closeIPO = async (req, res) => {
         });
 
     } catch (err) {
+        console.log("ISE > " + err.message);
         res.status(500).json({ message: err.message });
     }
 };
@@ -188,6 +195,8 @@ const getALLIPOs = async (req, res) => {
 
         res.json({ success: true, ipos });
     } catch (err) {
+        console.log("ISE > " + err.message);
+        
         res.status(500).json({ message: err.message });
     }
 };

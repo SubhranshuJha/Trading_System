@@ -4,7 +4,7 @@ import bidModel from '../models/bid.model.js';
 import stockModel from '../models/stock.model.js';
 import ledgerModel from '../models/ledger.model.js';
 import portfolioModel from '../models/portFolio.model.js';
-import companyModel from '../models/company.model.js';
+import companyModel from '../models/componey.model.js';
 
 const closeIPOInternal = async (ipoId) => {
     const session = await mongoose.startSession();
@@ -31,7 +31,7 @@ const closeIPOInternal = async (ipoId) => {
         const stock = await stockModel.findById(ipo.stockId).session(session);
         if (!stock) throw new Error('Stock not found');
 
-        const company = await companyModel.findById(ipo.companyId).session(session);
+        const company = await companyModel.findById(ipo.createdBy).session(session);
         if (!company) throw new Error('Company not found');
 
         // company balance ni deatils
@@ -166,6 +166,8 @@ const closeIPOInternal = async (ipoId) => {
             }
 
             // unlock the remaining locked amount
+            const refundQuantity = bid.quantity - bid.allocatedQuantity;
+
             if (refundAmount > 0) {
                 currentBalance += refundAmount;
 
@@ -173,7 +175,7 @@ const closeIPOInternal = async (ipoId) => {
                     userId: bid.userId,
                     type: 'UNLOCK',
                     symbol: stock.symbol,
-                    quantity: bid.quantity - bid.allocatedQuantity,
+                    quantity: refundQuantity,   // ✅ FIXED
                     price: bid.bidPrice,
                     amount: refundAmount,
                     balanceAfter: currentBalance,

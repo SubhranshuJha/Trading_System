@@ -194,6 +194,28 @@ export const createOrder = async (data) => {
                 referenceModel: "Trade"
             }], { session });
 
+            // 💰 Handle price improvement refund for BUY
+            if (buyOrder.price > trade.price) {
+                const refund = (buyOrder.price - trade.price) * trade.quantity;
+
+                const buyerLastAfter = await ledgerModel
+                    .findOne({ userId: buyerId })
+                    .sort({ createdAt: -1, _id: -1 })
+                    .session(session);
+
+                const updatedBalance = (buyerLastAfter ? buyerLastAfter.balanceAfter : 0) + refund;
+
+                await ledgerModel.create([{
+                    userId: buyerId,
+                    type: "UNLOCK",
+                    symbol: trade.symbol,
+                    amount: refund,
+                    balanceAfter: updatedBalance,
+                    referenceId: tradeId,
+                    referenceModel: "Trade"
+                }], { session });
+            }
+
             // update the seller ledger (add amount)
             const sellerLast = await ledgerModel
                 .findOne({ userId: sellerId })
@@ -245,6 +267,17 @@ export const createOrder = async (data) => {
 
             stock.locked -= remainingQty;
             stock.quantity += remainingQty;
+
+            await ledgerModel.create([{
+                userId: order.userId,
+                type: "UNLOCK",
+                symbol: order.symbol,
+                quantity: remainingQty,
+                amount: 0,
+                balanceAfter: currentBalance, 
+                referenceId: order._id,
+                referenceModel: "Order"
+            }], { session });
 
             await portfolio.save({ session });
         }

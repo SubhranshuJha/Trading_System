@@ -45,11 +45,10 @@ const bidSchema = new mongoose.Schema({
 
 bidSchema.index({ userId: 1, ipoId: 1 }, { unique: true });
 
-bidSchema.pre("save", function (next) {
+bidSchema.pre("save", async function () {
     if (this.quantity <= 0) {
-        return next(new Error("Quantity must be greater than 0"));
+        throw new Error("Quantity must be greater than 0");
     }
-    next();
 });
 
 const bidModel = mongoose.model("Bid", bidSchema);

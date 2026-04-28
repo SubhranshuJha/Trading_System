@@ -64,19 +64,17 @@ const ipoSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-ipoSchema.pre("save", function (next) {
+ipoSchema.pre("save", async function () {
     if (this.priceRange.min > this.priceRange.max) {
-        return next(new Error("Min price cannot be greater than max price"));
+        throw new Error("Min price cannot be greater than max price");
     }
-    next();
 });
 
 
-ipoSchema.pre("save", function (next) {
+ipoSchema.pre("save", async function () {
     if (this.startDate >= this.endDate) {
-        return next(new Error("Start date must be before end date"));
+        throw new Error("Start date must be before end date");
     }
-    next();
 });
 
 const ipoModel = mongoose.model('IPO', ipoSchema);

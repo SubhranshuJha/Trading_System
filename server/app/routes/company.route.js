@@ -1,7 +1,7 @@
 import express from "express";
 const companyRouter = express.Router();
 
-import companyAuthMiddleware from "../middlewear/companyAuth.middlewear";
+import companyAuthMiddleware from "../middlewear/companyAuth.middlewear.js";
 import { getCompanyProfile, getCompanyIPOs, getCompanyTrades , getCompanyStockDetails } from "../controllers/company.controller.js";
 
 // Company routes

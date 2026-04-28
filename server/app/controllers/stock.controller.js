@@ -10,19 +10,26 @@ const createStock = async (req , res ) => {
         
         const company = await companyModel.findById(companyId);
  
-        if ( !name || !symbol || !quantity  ) {
+        if ( !name || !quantity  ) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
-        const existingStock = await stockModel.findOne({ $or: [ { name }, { symbol } ] });
-        if ( existingStock ) {
-            return res.status(400).json({ success: false, message: "Stock with same name or symbol already exists" });
+        if( !company ) {
+            return res.status(404).json({ success: false, message: "Company not found" });
         }
+
+        const existingStock = await stockModel.findOne({ 
+            $or: [ 
+                { name }, 
+                { symbol: company.symbol } 
+            ] 
+            });
 
         const newStockData = {
             name,
             symbol: company.symbol,
-            quantity
+            totalShares : quantity,
+            createdBy: companyId
         }
 
         const newStock = await stockModel.create(newStockData);

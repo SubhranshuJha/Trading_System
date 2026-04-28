@@ -1,4 +1,4 @@
-import companyModel from "../models/company.model.js";
+import companyModel from "../models/componey.model.js";
 import ipoModel from "../models/ipo.model.js";
 import tradeModel from "../models/trade.model.js";
 import ledgerModel from "../models/ledger.model.js";

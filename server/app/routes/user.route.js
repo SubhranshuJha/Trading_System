@@ -1,6 +1,6 @@
 import express from "express";
 import { getUserProfile, getUserOrders, getUserTrades, getUserBalance , getUserPortfolio } from "../controllers/user.controller.js";
-import authMiddleware from "../middlewear/userAuth.middlewear.js";
+import userAuthMiddleware from "../middlewear/userAuth.middlewear.js";
 
 const userRouter = express.Router();
 
