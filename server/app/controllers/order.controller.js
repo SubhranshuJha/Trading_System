@@ -8,7 +8,7 @@ const placeBuyOrder = async (req, res) => {
         const stockSymbol = req.body.stockSymbol?.toUpperCase();
         const quantity = Number(req.body.quantity);
         const price = Number(req.body.price);
-        const { category } = req.body;
+        let { category } = req.body;
 
         if ( !stockSymbol || !category || !Number.isFinite(quantity) || !Number.isFinite(price) ) {
             return res.status(400).json ( {
@@ -16,6 +16,15 @@ const placeBuyOrder = async (req, res) => {
                 message: "Unable to place buy order ! All fields are required."    
             })
         }
+
+        category = category.toUpperCase();
+        if ( category !== "MARKET" && category !== "LIMIT" ) {
+            return res.status(400).json ( {
+                success: false,
+                message: "Unable to place buy order ! Invalid category."    
+            })
+        }
+
 
         if ( quantity <= 0 || price <= 0 ) {
             return res.status(400).json ( {
@@ -67,12 +76,20 @@ const placeSellOrder = async (req, res) => {
         const stockSymbol = req.body.stockSymbol?.toUpperCase();
         const quantity = Number(req.body.quantity);
         const price = Number(req.body.price);
-        const { category } = req.body;
+        let { category } = req.body;
 
         if ( !stockSymbol || !category || !Number.isFinite(quantity) || !Number.isFinite(price) ) {
             return res.status(400).json ( {
                 success: false,
                 message: "Unable to place sell order ! All fields are required."    
+            })
+        }
+
+        category = category.toUpperCase();
+        if ( category !== "MARKET" && category !== "LIMIT" ) {
+            return res.status(400).json ( {
+                success: false,
+                message: "Unable to place sell order ! Invalid category."    
             })
         }
 

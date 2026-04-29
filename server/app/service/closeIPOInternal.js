@@ -5,6 +5,7 @@ import stockModel from '../models/stock.model.js';
 import ledgerModel from '../models/ledger.model.js';
 import portfolioModel from '../models/portFolio.model.js';
 import companyModel from '../models/componey.model.js';
+import tradeModel from '../models/trade.model.js';
 
 const closeIPOInternal = async (ipoId) => {
     const session = await mongoose.startSession();
@@ -214,6 +215,18 @@ const closeIPOInternal = async (ipoId) => {
                 stockEntry.quantity += bid.allocatedQuantity;
 
                 await portfolio.save({ session });
+
+                // Create Trade document for IPO allocation
+                await tradeModel.create([{
+                    buyerId: bid.userId,
+                    sellerId: company._id,
+                    bidId: bid._id,
+                    symbol: stock.symbol,
+                    price: settlementPrice,
+                    quantity: bid.allocatedQuantity,
+                    totalAmount: bid.allocatedQuantity * settlementPrice,
+                    type: 'IPO'
+                }], { session });
             }
 
             await bid.save({ session });

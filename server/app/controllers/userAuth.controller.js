@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import userModel from "../models/user.model.js";
 import blackListToken from "../models/blackListToken.model.js";
@@ -54,7 +53,7 @@ const registerUser = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("ISE > REG USER FAILED DUE TO EXCEPTION ");
+        console.log("ISE > REG USER FAILED DUE TO EXCEPTION " + error);
         return res.status(500).json ( {
             success: false,
             message: "user registration failed ! Something went wrong."
@@ -130,7 +129,7 @@ const  logoutUser = async (req, res) => {
         })
         
     } catch (error) {
-        console.log("ISE > LOGOUT USER FAILED DUE TO EXCEPTION ");
+        console.log("ISE > LOGOUT USER FAILED DUE TO EXCEPTION " + error);
         return res.status(500).json ( {
             success: false,
             message: "user logout failed ! Something went wrong."

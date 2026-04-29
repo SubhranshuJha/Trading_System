@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import companyModel from "../models/componey.model.js";
 import blackListToken from "../models/blackListToken.model.js";
@@ -11,7 +10,7 @@ const registerCompany = async (req, res) => {
     try {
     
         let { email , name , password , description , symbol } = req.body;
-        symbol = symbol.toUpperCase().trim();
+
 
         if ( !email || !name || !password || !symbol ) {
             return res.status(400).json ( {
@@ -20,6 +19,7 @@ const registerCompany = async (req, res) => {
             })
         }
 
+        symbol = symbol.toUpperCase().trim();
         if ( name.length < 3 ) {
             return res.status(400).json ( {
                 success: false,
@@ -54,10 +54,10 @@ const registerCompany = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("ISE > REG COMPANY FAILED DUE TO EXCEPTION ");
+        console.log("ISE > REG COMPANY FAILED DUE TO EXCEPTION " + error);
         return res.status(500).json ( {
             success: false,
-            message: "company registration failed ! Something went wrong."
+            message: "company registration failed ! Something went wrong." 
         })
     }
 
@@ -130,7 +130,7 @@ const  logoutCompany = async (req, res) => {
         })
         
     } catch (error) {
-        console.log("ISE > LOGOUT COMPANY FAILED DUE TO EXCEPTION ");
+        console.log("ISE > LOGOUT COMPANY FAILED DUE TO EXCEPTION " + error);
         return res.status(500).json ( {
             success: false,
             message: "company logout failed ! Something went wrong."

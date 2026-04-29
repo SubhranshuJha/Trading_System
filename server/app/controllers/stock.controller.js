@@ -18,12 +18,10 @@ const createStock = async (req , res ) => {
             return res.status(404).json({ success: false, message: "Company not found" });
         }
 
-        const existingStock = await stockModel.findOne({ 
-            $or: [ 
-                { name }, 
-                { symbol: company.symbol } 
-            ] 
-            });
+        const existingStock = await stockModel.findOne({ symbol: company.symbol });
+        if ( existingStock ) {
+            return res.status(400).json({ success: false, message: "Stock with the same symbol already exists" });
+        }
 
         const newStockData = {
             name,
@@ -58,7 +56,7 @@ const getStockBySymbol= async ( req , res ) => {
     try {
 
         const { symbol } = req.params;
-        const stock = await stockModel.findOne({ symbol });
+        const stock = await stockModel.findOne({ symbol: symbol.toUpperCase() });
         if (!stock) {
             return res.status(404).json({ success: false, message: "Stock not found" });
         }

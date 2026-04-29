@@ -2,6 +2,7 @@ package service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import model.Trade;
 
 import model.Order;
@@ -27,7 +28,7 @@ public class ExchangeService {
     }
 
     public OrderBook getOrderBook(String symbol) {
-        return orderBooks.get(symbol);
+        return orderBooks.get(symbol.toUpperCase(Locale.ROOT));
     }
 
     public HashMap<String, OrderBook> getAllOrderBooks() {

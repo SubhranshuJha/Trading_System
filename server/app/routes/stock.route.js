@@ -5,7 +5,7 @@ import companyAuthMiddleware from '../middlewear/companyAuth.middlewear.js';
 const stockRouter = express.Router();
 
 stockRouter.post('/create', companyAuthMiddleware,createStock);
-stockRouter.get('/all', companyAuthMiddleware, getAllStocks);
+stockRouter.get('/all', getAllStocks);
 stockRouter.get('/:symbol', companyAuthMiddleware, getStockBySymbol);
 
 

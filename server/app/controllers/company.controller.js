@@ -2,7 +2,7 @@ import companyModel from "../models/componey.model.js";
 import ipoModel from "../models/ipo.model.js";
 import tradeModel from "../models/trade.model.js";
 import ledgerModel from "../models/ledger.model.js";
-
+import stockModel from "../models/stock.model.js";
 
 const getCompanyProfile = async (req, res) => {
     try {
@@ -20,7 +20,7 @@ const getCompanyProfile = async (req, res) => {
         }
 
         const companyLedger = await ledgerModel
-            .find({ company: companyId })
+            .find({ companyId })
             .sort({ createdAt: -1 });
 
         res.status(200).json({
@@ -74,7 +74,8 @@ const getCompanyIPOs = async (req, res) => {
         const companyId = req.user.id;
 
         const companyIPOs = await ipoModel
-            .find({ company: companyId })
+            .find({ createdBy: companyId })
+            .populate("stockId")
             .sort({ createdAt: -1 });
 
         res.status(200).json({
@@ -94,13 +95,18 @@ const getCompanyTrades = async (req, res) => {
     try {
         const companyId = req.user.id;
 
-        const ipos = await ipoModel.find({ company: companyId }).select("_id");
-        const ipoIds = ipos.map(ipo => ipo._id);
-Os
+        const company = await companyModel.findById(companyId).select("symbol");
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found"
+            });
+        }
+
         const companyTrades = await tradeModel
-            .find({ ipo: { $in: ipoIds } })
-            .populate("user", "name email")
-            .populate("ipo", "cutoffPrice status")
+            .find({ sellerId: company._id })
+            .populate("buyerId", "name email")
+            .populate("sellerId", "name email")
             .sort({ createdAt: -1 });
 
         res.status(200).json({

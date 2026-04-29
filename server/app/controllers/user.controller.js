@@ -56,7 +56,9 @@ const getUserTrades = async (req, res) => {
     const userId = req.id;
 
     const userTrades = await tradeModel
-      .find({ userId })
+      .find({
+        $or: [{ buyerId: userId }, { sellerId: userId }],
+      })
       .sort({ createdAt: -1 });
     return res.status(200).json({
       success: true,

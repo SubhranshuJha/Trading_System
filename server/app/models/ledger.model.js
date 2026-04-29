@@ -48,5 +48,12 @@ const ledgerSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+ledgerSchema.pre("validate", function (next) {
+  if (!this.userId && !this.companyId) {
+    return next(new Error("Either userId or companyId is required"));
+  }
+  next();
+});
+
 const ledgerModel = mongoose.model('Ledger', ledgerSchema);
 export default ledgerModel;

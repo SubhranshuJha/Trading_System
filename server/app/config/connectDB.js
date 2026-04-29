@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const connectDB = async (params) => {
+const connectDB = async () => {
     
     try {
         mongoose.connection.on( 'connected', () => {

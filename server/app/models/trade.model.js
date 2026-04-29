@@ -11,19 +11,25 @@ const tradeSchema = new mongoose.Schema({
   sellerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    required: false
   },
 
   buyOrderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Order",
-    required: true
+    required: false
   },
 
   sellOrderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Order",
-    required: true
+    required: false
+  },
+
+  bidId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Bid",
+    required: false
   },
 
   symbol: {
@@ -44,6 +50,12 @@ const tradeSchema = new mongoose.Schema({
   totalAmount: {
     type: Number,
     required: true
+  },
+
+  type: {
+    type: String,
+    enum: ['SECONDARY', 'IPO'],
+    default: 'SECONDARY'
   }
 
 }, { timestamps: true });

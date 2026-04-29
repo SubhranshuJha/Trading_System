@@ -68,14 +68,31 @@ public class EngineHttpServer {
             }
 
             try {
+                String normalizedSymbol = payload.get("symbol").trim().toUpperCase(Locale.ROOT);
+                double price = Double.parseDouble(payload.get("price"));
+                int quantity = Integer.parseInt(payload.get("quantity"));
+
+                if (normalizedSymbol.isEmpty()) {
+                    writeJson(exchange, 400, "{\"error\":\"symbol cannot be empty\"}");
+                    return;
+                }
+                if (price <= 0) {
+                    writeJson(exchange, 400, "{\"error\":\"price must be greater than zero\"}");
+                    return;
+                }
+                if (quantity <= 0) {
+                    writeJson(exchange, 400, "{\"error\":\"quantity must be greater than zero\"}");
+                    return;
+                }
+
                 Order order = new Order(
                         payload.get("id"),
-                        payload.get("symbol"),
+                        normalizedSymbol,
                         payload.get("userId"),
                         OrderType.valueOf(payload.get("type").toUpperCase(Locale.ROOT)),
                         OrderCategory.valueOf(payload.get("category").toUpperCase(Locale.ROOT)),
-                        Double.parseDouble(payload.get("price")),
-                        Integer.parseInt(payload.get("quantity"))
+                        price,
+                        quantity
                 );
 
                 List<Trade> trades = exchangeService.placeOrder(order);
@@ -112,7 +129,7 @@ public class EngineHttpServer {
                 return;
             }
 
-            OrderBook orderBook = exchangeService.getOrderBook(symbol);
+            OrderBook orderBook = exchangeService.getOrderBook(symbol.toUpperCase());
             if (orderBook == null) {
                 writeJson(exchange, 200, "{\"symbol\":\"" + escapeJson(symbol) + "\",\"buy\":[],\"sell\":[]}");
                 return;
@@ -163,7 +180,7 @@ public class EngineHttpServer {
 
     private static Map<String, String> parseFlatJson(String json) {
         Map<String, String> values = new HashMap<>();
-        Pattern pattern = Pattern.compile("\"([A-Za-z0-9_]+)\"\\s*:\\s*(\"[^\"]*\"|-?\\d+|true|false|null)");
+        Pattern pattern = Pattern.compile("\"([A-Za-z0-9_]+)\"\\s*:\\s*(\"[^\"]*\"|-?\\d+(?:\\.\\d+)?|true|false|null)");
         Matcher matcher = pattern.matcher(json);
 
         while (matcher.find()) {
