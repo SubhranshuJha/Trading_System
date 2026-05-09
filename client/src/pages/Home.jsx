@@ -1,124 +1,253 @@
+import { Link } from 'react-router-dom';
+import NavBar from '../components/NavBar';
+
+import {
+  ArrowRight,
+  CandlestickChart,
+  Wallet,
+  ShieldCheck,
+  Building2,
+  TrendingUp,
+  Activity,
+} from 'lucide-react';
+
 const Home = () => {
-
   return (
+    <div className="min-h-screen overflow-hidden bg-[#020617] text-white">
+      <NavBar />
 
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Navbar */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-white/10 backdrop-blur-md sticky top-0 z-50 bg-black/70">
-        <h1 className="text-2xl font-bold tracking-wide">
-          Quant<span className="text-indigo-500">Edge</span>
-        </h1>
+      {/* BACKGROUND LIGHTS */}
+      <div className="absolute left-0 top-0 h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[140px]" />
+      <div className="absolute right-0 top-0 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[120px]" />
 
-        <div className="hidden md:flex items-center gap-8 text-sm text-gray-300">
-          <a href="#features" className="hover:text-white transition">
-            Features
-          </a>
-          <a href="#markets" className="hover:text-white transition">
-            Markets
-          </a>
-          <a href="#about" className="hover:text-white transition">
-            About
-          </a>
-        </div>
-
-        <button className="bg-indigo-600 hover:bg-indigo-500 px-5 py-2 rounded-xl transition shadow-lg shadow-indigo-500/20">
-          Get Started
-        </button>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative px-8 md:px-20 py-24 flex flex-col lg:flex-row items-center justify-between gap-14">
-        <div className="max-w-2xl z-10">
-          <p className="uppercase tracking-[0.3em] text-indigo-400 text-sm mb-5">
-            Smart Trading Platform
-          </p>
-
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
-            Trade Smarter with <br />
-            <span className="text-indigo-500">QuantEdge</span>
-          </h1>
-
-          <p className="text-gray-400 text-lg mt-8 leading-relaxed max-w-xl">
-            A modern MERN-based trading platform with portfolio tracking,
-            watchlists, real-time market dashboards, and intelligent trading
-            insights.
-          </p>
-
-          <div className="flex flex-wrap gap-5 mt-10">
-            <button className="bg-indigo-600 hover:bg-indigo-500 px-7 py-3 rounded-2xl text-lg font-semibold transition shadow-xl shadow-indigo-500/30">
-              Start Trading
-            </button>
-
-            <button className="border border-white/20 hover:border-white/50 px-7 py-3 rounded-2xl text-lg transition">
-              Explore Demo
-            </button>
-          </div>
-
-          <div className="flex gap-10 mt-14 text-sm text-gray-400">
-            <div>
-              <h2 className="text-3xl font-bold text-white">10K+</h2>
-              <p>Transactions</p>
+      {/* HERO */}
+      <section className="relative border-b border-slate-900">
+        <div className="mx-auto grid max-w-7xl gap-20 px-6 py-24 lg:grid-cols-2 lg:items-center">
+          
+          {/* LEFT */}
+          <div>
+            
+            {/* BADGE */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm text-slate-300 backdrop-blur">
+              <Activity size={15} className="text-cyan-400" />
+              Real-Time Trading Infrastructure
             </div>
 
-            <div>
-              <h2 className="text-3xl font-bold text-white">500+</h2>
-              <p>Active Traders</p>
+            {/* HEADING */}
+            <h1 className="mt-8 text-5xl font-bold leading-[1.05] md:text-7xl">
+              Trade Stocks.
+              <br />
+
+              Launch IPOs.
+              <br />
+
+              <span className="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                Build Wealth.
+              </span>
+            </h1>
+
+            {/* DESC */}
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-400">
+              QuantEdge is a modern stock trading and IPO platform
+              built for traders, investors, and companies. Execute
+              trades, track portfolios, launch IPOs, and manage
+              investments through a powerful financial ecosystem.
+            </p>
+
+            {/* BUTTONS */}
+            <div className="mt-10 flex flex-wrap gap-4">
+              
+              <Link
+                to="/register"
+                state={{ role: 'user' }}
+                className="flex items-center gap-2 rounded-2xl bg-cyan-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300"
+              >
+                Start Trading
+                <ArrowRight size={18} />
+              </Link>
+
+              <Link
+                to="/register"
+                state={{ role: 'company' }}
+                className="rounded-2xl border border-slate-700 bg-slate-900/70 px-6 py-3 font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+              >
+                Register Company
+              </Link>
             </div>
 
-            <div>
-              <h2 className="text-3xl font-bold text-white">99.9%</h2>
-              <p>Secure Platform</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Trading Card */}
-        <div className="relative w-full max-w-lg">
-          <div className="absolute inset-0 bg-indigo-500 blur-3xl opacity-20 rounded-full"></div>
-
-          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-7 shadow-2xl">
-            <div className="flex items-center justify-between mb-8">
+            {/* STATS */}
+            <div className="mt-16 flex flex-wrap gap-12">
+              
               <div>
-                <p className="text-gray-400 text-sm">Portfolio Balance</p>
-                <h2 className="text-4xl font-bold mt-2">₹2,45,320</h2>
+                <h2 className="text-3xl font-bold">10K+</h2>
+
+                <p className="mt-1 text-slate-500">
+                  Active Traders
+                </p>
               </div>
 
-              <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-xl text-sm">
-                +12.4%
+              <div>
+                <h2 className="text-3xl font-bold">500+</h2>
+
+                <p className="mt-1 text-slate-500">
+                  Listed Companies
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-3xl font-bold">₹120Cr+</h2>
+
+                <p className="mt-1 text-slate-500">
+                  Monthly Volume
+                </p>
               </div>
             </div>
+          </div>
 
-            <div className="space-y-5">
-              <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+          {/* RIGHT SIDE */}
+          <div className="relative">
+            
+            {/* MAIN DASHBOARD */}
+            <div className="rounded-[32px] border border-slate-800 bg-slate-900/70 p-6 shadow-2xl backdrop-blur-xl">
+              
+              {/* TOP BAR */}
+              <div className="flex items-center justify-between">
+                
                 <div>
-                  <h3 className="font-semibold">AAPL</h3>
-                  <p className="text-gray-400 text-sm">Apple Inc.</p>
+                  <p className="text-sm text-slate-500">
+                    Portfolio Value
+                  </p>
+
+                  <h2 className="mt-2 text-4xl font-bold">
+                    ₹8,42,120
+                  </h2>
+
+                  <p className="mt-2 text-sm font-medium text-green-400">
+                    +12.8% this month
+                  </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">₹18,320</p>
-                  <p className="text-green-400 text-sm">+5.2%</p>
+
+                <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+                  <Wallet
+                    size={28}
+                    className="text-cyan-300"
+                  />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                <div>
-                  <h3 className="font-semibold">TSLA</h3>
-                  <p className="text-gray-400 text-sm">Tesla</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">₹9,850</p>
-                  <p className="text-red-400 text-sm">-1.3%</p>
+              {/* MINI CHART */}
+              <div className="mt-10 h-40 rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-800/40 to-slate-900 p-4">
+                
+                <div className="flex h-full items-end gap-3">
+                  
+                  <div className="h-[35%] w-full rounded-t bg-cyan-400/60"></div>
+                  <div className="h-[55%] w-full rounded-t bg-cyan-400/70"></div>
+                  <div className="h-[45%] w-full rounded-t bg-cyan-400/50"></div>
+                  <div className="h-[70%] w-full rounded-t bg-cyan-400"></div>
+                  <div className="h-[60%] w-full rounded-t bg-cyan-400/80"></div>
+                  <div className="h-[82%] w-full rounded-t bg-cyan-300"></div>
+                  <div className="h-[75%] w-full rounded-t bg-cyan-400"></div>
+                  <div className="h-[95%] w-full rounded-t bg-cyan-300"></div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
-                <div>
-                  <h3 className="font-semibold">NVDA</h3>
-                  <p className="text-gray-400 text-sm">NVIDIA</p>
+              {/* MARKET SECTION */}
+              <div className="mt-8 grid gap-4">
+                
+                <div className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-green-500/10 p-2">
+                      <TrendingUp
+                        size={18}
+                        className="text-green-400"
+                      />
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold">
+                        RELIANCE
+                      </h3>
+
+                      <p className="text-sm text-slate-500">
+                        Reliance Industries
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="font-semibold">
+                      ₹2,943
+                    </p>
+
+                    <p className="text-sm font-medium text-green-400">
+                      +2.14%
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">₹27,150</p>
-                  <p className="text-green-400 text-sm">+8.7%</p>
+
+                <div className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-red-500/10 p-2">
+                      <TrendingUp
+                        size={18}
+                        className="rotate-180 text-red-400"
+                      />
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold">
+                        INFY
+                      </h3>
+
+                      <p className="text-sm text-slate-500">
+                        Infosys
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="font-semibold">
+                      ₹1,812
+                    </p>
+
+                    <p className="text-sm font-medium text-red-400">
+                      -1.08%
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* BOTTOM GRID */}
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                  <p className="text-sm text-slate-500">
+                    Open IPO
+                  </p>
+
+                  <h3 className="mt-3 text-xl font-semibold">
+                    ABC Holdings
+                  </h3>
+
+                  <p className="mt-1 text-sm text-cyan-300">
+                    ₹90 - ₹110
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                  <p className="text-sm text-slate-500">
+                    Daily Trades
+                  </p>
+
+                  <h3 className="mt-3 text-xl font-semibold">
+                    24.5K
+                  </h3>
+
+                  <p className="mt-1 text-sm text-green-400">
+                    +18% today
+                  </p>
                 </div>
               </div>
             </div>
@@ -126,73 +255,102 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features */}
-      <section
-        id="features"
-        className="px-8 md:px-20 py-24 bg-white/[0.02] border-y border-white/5"
-      >
-        <div className="text-center mb-16">
-          <p className="text-indigo-400 uppercase tracking-[0.3em] text-sm">
-            Features
+      {/* FEATURES */}
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        
+        <div className="text-center">
+          <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
+            Platform Features
           </p>
 
-          <h2 className="text-4xl md:text-5xl font-bold mt-5">
-            Everything You Need to Trade
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white/5 border border-white/10 p-8 rounded-3xl hover:scale-105 transition duration-300">
-            <div className="text-5xl mb-5">📈</div>
-            <h3 className="text-2xl font-bold mb-4">Live Market Tracking</h3>
-            <p className="text-gray-400 leading-relaxed">
-              Monitor stocks, trends, and market movements with real-time styled
-              dashboards.
-            </p>
-          </div>
-
-          <div className="bg-white/5 border border-white/10 p-8 rounded-3xl hover:scale-105 transition duration-300">
-            <div className="text-5xl mb-5">💼</div>
-            <h3 className="text-2xl font-bold mb-4">Portfolio Management</h3>
-            <p className="text-gray-400 leading-relaxed">
-              Track investments, profits, holdings, and trading history in one
-              place.
-            </p>
-          </div>
-
-          <div className="bg-white/5 border border-white/10 p-8 rounded-3xl hover:scale-105 transition duration-300">
-            <div className="text-5xl mb-5">🤖</div>
-            <h3 className="text-2xl font-bold mb-4">Smart Insights</h3>
-            <p className="text-gray-400 leading-relaxed">
-              Analyze trends and trading performance using intelligent insights
-              and analytics.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="px-8 md:px-20 py-28 text-center relative overflow-hidden">
-        <div className="absolute w-96 h-96 bg-indigo-500/20 blur-3xl rounded-full top-0 left-1/2 -translate-x-1/2"></div>
-
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold leading-tight">
-            The Future of Trading Starts Here.
+          <h2 className="mt-5 text-4xl font-bold">
+            Built for Modern Trading
           </h2>
 
-          <p className="text-gray-400 text-lg mt-8 leading-relaxed">
-            Build your portfolio, monitor markets, and experience a powerful
-            modern trading ecosystem with QuantEdge.
+          <p className="mx-auto mt-5 max-w-2xl text-slate-400">
+            Powerful infrastructure for trading, IPO management,
+            portfolio tracking, and financial operations.
           </p>
+        </div>
 
-          <button className="mt-10 bg-indigo-600 hover:bg-indigo-500 px-10 py-4 rounded-2xl text-lg font-semibold transition shadow-2xl shadow-indigo-500/30">
-            Launch App
-          </button>
+        {/* GRID */}
+        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-slate-700">
+            <div className="w-fit rounded-2xl border border-slate-700 bg-slate-800 p-3">
+              <CandlestickChart
+                size={26}
+                className="text-cyan-300"
+              />
+            </div>
+
+            <h3 className="mt-6 text-xl font-semibold">
+              Trading Engine
+            </h3>
+
+            <p className="mt-3 text-slate-400">
+              Execute buy and sell orders with efficient order
+              matching infrastructure.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-slate-700">
+            <div className="w-fit rounded-2xl border border-slate-700 bg-slate-800 p-3">
+              <Wallet
+                size={26}
+                className="text-cyan-300"
+              />
+            </div>
+
+            <h3 className="mt-6 text-xl font-semibold">
+              Smart Portfolio
+            </h3>
+
+            <p className="mt-3 text-slate-400">
+              Track holdings, balances, executed trades, and
+              portfolio growth.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-slate-700">
+            <div className="w-fit rounded-2xl border border-slate-700 bg-slate-800 p-3">
+              <Building2
+                size={26}
+                className="text-cyan-300"
+              />
+            </div>
+
+            <h3 className="mt-6 text-xl font-semibold">
+              IPO Platform
+            </h3>
+
+            <p className="mt-3 text-slate-400">
+              Launch and manage IPOs while connecting directly
+              with investors.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-slate-700">
+            <div className="w-fit rounded-2xl border border-slate-700 bg-slate-800 p-3">
+              <ShieldCheck
+                size={26}
+                className="text-cyan-300"
+              />
+            </div>
+
+            <h3 className="mt-6 text-xl font-semibold">
+              Secure System
+            </h3>
+
+            <p className="mt-3 text-slate-400">
+              JWT authentication, protected financial flows, and
+              secure infrastructure.
+            </p>
+          </div>
         </div>
       </section>
     </div>
   );
-}
+};
 
-
-export default Home
+export default Home;
