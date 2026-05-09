@@ -1,6 +1,6 @@
 # Backend API Guide for Frontend Developers
 
-This document is the frontend-facing contract for the backend in this project. It focuses on what the UI needs to call, what headers to send, and the shape of the main responses.
+This document is the frontend-facing contract for the backend in this project. It shows the exact endpoints, required headers, request bodies, and example responses returned by the current controllers.
 
 ## Base URL
 
@@ -8,18 +8,18 @@ Local development server:
 
 - `http://localhost:5000`
 
-The server exposes a simple health check at `/`.
+Health check:
+
+- `GET /`
 
 ## Common Conventions
 
-- All requests use JSON bodies unless noted otherwise.
-- Protected routes require an `Authorization` header in the form `Bearer <token>`.
-- Tokens are JWTs returned from the login endpoints.
-- Logout works by blacklisting the current token, so the frontend should remove the token from storage after a successful logout.
+- All JSON endpoints use `Content-Type: application/json`.
+- Protected routes require `Authorization: Bearer <token>`.
+- User auth and company auth are separate flows and must be stored separately on the frontend.
+- Some error responses return `{ success: false, message: "..." }`, while a few endpoints return only `{ message: "..." }` on failure. The examples below follow the current backend behavior.
 
-### Typical success response
-
-Most endpoints return JSON shaped like this:
+### Common success shape
 
 ```json
 {
@@ -28,9 +28,7 @@ Most endpoints return JSON shaped like this:
 }
 ```
 
-Some endpoints also include a resource payload such as `token`, `user`, `company`, `stockDetails`, `orders`, `trades`, `portfolio`, `bid`, `ipo`, or `data`.
-
-### Typical error response
+### Common error shape
 
 ```json
 {
@@ -41,20 +39,13 @@ Some endpoints also include a resource payload such as `token`, `user`, `company
 
 ## Authentication
 
-There are two auth flows:
-
-- User auth for trading users.
-- Company auth for company/admin actions.
-
-Both login endpoints return a JWT token that should be sent in `Authorization: Bearer <token>`.
-
-### User Auth
+### User auth
 
 #### Register user
 
 - `POST /api/auth-user/register`
 
-Request body:
+Request
 
 ```json
 {
@@ -62,6 +53,24 @@ Request body:
   "name": "User Name",
   "password": "StrongPass@123",
   "type": "USER"
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "user registered successfully."
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "user registration failed ! All fields are required."
 }
 ```
 
@@ -75,7 +84,7 @@ Notes:
 
 - `POST /api/auth-user/login`
 
-Request body:
+Request
 
 ```json
 {
@@ -84,7 +93,7 @@ Request body:
 }
 ```
 
-Response includes:
+Example success response
 
 ```json
 {
@@ -94,21 +103,50 @@ Response includes:
 }
 ```
 
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "user login failed ! Invalid email or password."
+}
+```
+
 #### Logout user
 
 - `POST /api/auth-user/logout`
 
-Headers:
+Headers
 
-- `Authorization: Bearer <token>`
+```http
+Authorization: Bearer <user-token>
+```
 
-### Company Auth
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "user logged out successfully."
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "user logout failed ! Token is required."
+}
+```
+
+### Company auth
 
 #### Register company
 
 - `POST /api/auth-company/register`
 
-Request body:
+Request
 
 ```json
 {
@@ -117,6 +155,24 @@ Request body:
   "password": "StrongPass@123",
   "description": "Optional company description",
   "symbol": "ABC"
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "company registered successfully."
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "company registration failed ! All fields are required."
 }
 ```
 
@@ -129,7 +185,7 @@ Notes:
 
 - `POST /api/auth-company/login`
 
-Request body:
+Request
 
 ```json
 {
@@ -138,15 +194,52 @@ Request body:
 }
 ```
 
-Response includes a JWT token.
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "company logged in successfully.",
+  "token": "jwt-token-here"
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "company login failed ! Invalid email or password."
+}
+```
 
 #### Logout company
 
 - `POST /api/auth-company/logout`
 
-Headers:
+Headers
 
-- `Authorization: Bearer <token>`
+```http
+Authorization: Bearer <company-token>
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "company logged out successfully."
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "company logout failed ! Token is required."
+}
+```
 
 ## Public Routes
 
@@ -154,10 +247,10 @@ Headers:
 
 - `GET /`
 
-Returns:
+Example response
 
-```json
-"Server is running"
+```text
+Server is running
 ```
 
 ### Stocks
@@ -166,17 +259,131 @@ Returns:
 
 - `GET /api/stock/all`
 
-Returns:
+Example success response
 
 ```json
 {
   "success": true,
   "message": "Stocks fetched successfully",
-  "data": []
+  "data": [
+    {
+      "_id": "66c111111111111111111111",
+      "name": "ABC Industries",
+      "symbol": "ABC",
+      "totalShares": 100000,
+      "issuedShares": 0,
+      "currentPrice": 0,
+      "isListed": false,
+      "isActive": true,
+      "createdBy": "66c222222222222222222222",
+      "createdAt": "2026-05-01T10:00:00.000Z",
+      "updatedAt": "2026-05-01T10:00:00.000Z"
+    }
+  ]
 }
 ```
 
-Each stock record can include fields like `name`, `symbol`, `totalShares`, `issuedShares`, `currentPrice`, `isListed`, `isActive`, and `createdBy`.
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to fetch stocks"
+}
+```
+
+#### Create stock
+
+- `POST /api/stock/create`
+
+Headers
+
+```http
+Authorization: Bearer <company-token>
+Content-Type: application/json
+```
+
+Request
+
+```json
+{
+  "name": "ABC Industries",
+  "quantity": 100000
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "Stock created successfully",
+  "data": {
+    "_id": "66c111111111111111111111",
+    "name": "ABC Industries",
+    "symbol": "ABC",
+    "totalShares": 100000,
+    "issuedShares": 0,
+    "currentPrice": 0,
+    "isListed": false,
+    "isActive": true,
+    "createdBy": "66c222222222222222222222",
+    "createdAt": "2026-05-01T10:00:00.000Z",
+    "updatedAt": "2026-05-01T10:00:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Stock with the same symbol already exists"
+}
+```
+
+#### Get stock by symbol
+
+- `GET /api/stock/:symbol`
+
+Example request
+
+```http
+GET /api/stock/ABC
+Authorization: Bearer <company-token>
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "Stock fetched successfully",
+  "data": {
+    "_id": "66c111111111111111111111",
+    "name": "ABC Industries",
+    "symbol": "ABC",
+    "totalShares": 100000,
+    "issuedShares": 0,
+    "currentPrice": 0,
+    "isListed": false,
+    "isActive": true,
+    "createdBy": "66c222222222222222222222",
+    "createdAt": "2026-05-01T10:00:00.000Z",
+    "updatedAt": "2026-05-01T10:00:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Stock not found"
+}
+```
 
 ### IPOs
 
@@ -184,12 +391,43 @@ Each stock record can include fields like `name`, `symbol`, `totalShares`, `issu
 
 - `GET /api/ipo`
 
-Returns:
+Example success response
 
 ```json
 {
   "success": true,
-  "ipos": []
+  "ipos": [
+    {
+      "_id": "66c333333333333333333333",
+      "stockId": {
+        "_id": "66c111111111111111111111",
+        "name": "ABC Industries",
+        "symbol": "ABC"
+      },
+      "totalShares": 10000,
+      "priceRange": {
+        "min": 90,
+        "max": 110
+      },
+      "cutoffPrice": null,
+      "lotSize": 10,
+      "soldShares": 0,
+      "status": "UPCOMING",
+      "startDate": "2026-05-01T00:00:00.000Z",
+      "endDate": "2026-05-15T00:00:00.000Z",
+      "createdBy": "66c222222222222222222222",
+      "createdAt": "2026-05-01T10:00:00.000Z",
+      "updatedAt": "2026-05-01T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "some error message"
 }
 ```
 
@@ -197,11 +435,184 @@ Returns:
 
 - `GET /api/ipo/:symbol`
 
-Example:
+Example request
 
-- `GET /api/ipo/ABC`
+```http
+GET /api/ipo/ABC
+```
 
-Returns the latest IPO for the stock symbol.
+Example success response
+
+```json
+{
+  "success": true,
+  "ipo": {
+    "_id": "66c333333333333333333333",
+    "stockId": {
+      "_id": "66c111111111111111111111",
+      "name": "ABC Industries",
+      "symbol": "ABC"
+    },
+    "totalShares": 10000,
+    "priceRange": {
+      "min": 90,
+      "max": 110
+    },
+    "lotSize": 10,
+    "status": "OPEN"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "IPO not found"
+}
+```
+
+#### Place IPO bid
+
+- `POST /api/ipo/:id/bid`
+
+Headers
+
+```http
+Authorization: Bearer <user-token>
+Content-Type: application/json
+```
+
+Request
+
+```json
+{
+  "quantity": 100,
+  "bidPrice": 95
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "bid": {
+    "_id": "66c444444444444444444444",
+    "userId": "66c555555555555555555555",
+    "ipoId": "66c333333333333333333333",
+    "quantity": 100,
+    "bidPrice": 95,
+    "status": "PENDING",
+    "createdAt": "2026-05-01T10:15:00.000Z",
+    "updatedAt": "2026-05-01T10:15:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "Bid price must be within IPO price range"
+}
+```
+
+#### Create IPO
+
+- `POST /api/ipo/create`
+
+Headers
+
+```http
+Authorization: Bearer <company-token>
+Content-Type: application/json
+```
+
+Request
+
+```json
+{
+  "stockId": "66c111111111111111111111",
+  "totalShares": 10000,
+  "priceRange": {
+    "min": 90,
+    "max": 110
+  },
+  "startDate": "2026-05-01T00:00:00.000Z",
+  "endDate": "2026-05-15T00:00:00.000Z",
+  "lotSize": 10
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "ipo": {
+    "_id": "66c333333333333333333333",
+    "stockId": "66c111111111111111111111",
+    "totalShares": 10000,
+    "priceRange": {
+      "min": 90,
+      "max": 110
+    },
+    "lotSize": 10,
+    "soldShares": 0,
+    "status": "UPCOMING",
+    "startDate": "2026-05-01T00:00:00.000Z",
+    "endDate": "2026-05-15T00:00:00.000Z",
+    "createdBy": "66c222222222222222222222",
+    "createdAt": "2026-05-01T10:00:00.000Z",
+    "updatedAt": "2026-05-01T10:00:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "Stock already listed"
+}
+```
+
+#### Close IPO
+
+- `PATCH /api/ipo/:id/close`
+
+Headers
+
+```http
+Authorization: Bearer <company-token>
+```
+
+Example request
+
+```http
+PATCH /api/ipo/66c333333333333333333333/close
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "IPO closed",
+  "result": {
+    "status": "CLOSED"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "IPO not found"
+}
+```
 
 ## User Protected Routes
 
@@ -213,38 +624,175 @@ All routes in this section require:
 
 - `GET /api/user/profile`
 
-Returns the user document without the password.
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "User data fetched successfully !",
+  "user": {
+    "_id": "66c555555555555555555555",
+    "email": "user@example.com",
+    "name": "User Name",
+    "type": "USER",
+    "createdAt": "2026-05-01T09:00:00.000Z",
+    "updatedAt": "2026-05-01T09:00:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to get user data ! User not found."
+}
+```
 
 ### User orders
 
 - `GET /api/user/orders`
 
-Returns the user’s orders sorted newest first.
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "User orders fetched successfully !",
+  "orders": [
+    {
+      "_id": "66c666666666666666666666",
+      "userId": "66c555555555555555555555",
+      "symbol": "ABC",
+      "type": "BUY",
+      "category": "LIMIT",
+      "price": 100,
+      "quantity": 10,
+      "remainingQty": 0,
+      "status": "COMPLETED",
+      "createdAt": "2026-05-01T10:20:00.000Z",
+      "updatedAt": "2026-05-01T10:20:00.000Z"
+    }
+  ]
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to get user orders ! Something went wrong."
+}
+```
 
 ### User trades
 
 - `GET /api/user/trades`
 
-Returns trades where the user is either buyer or seller.
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "User trades fetched successfully !",
+  "trades": [
+    {
+      "_id": "66c777777777777777777777",
+      "buyerId": "66c555555555555555555555",
+      "sellerId": "66c888888888888888888888",
+      "buyOrderId": "66c666666666666666666666",
+      "sellOrderId": "66c999999999999999999999",
+      "symbol": "ABC",
+      "price": 100,
+      "quantity": 10,
+      "totalAmount": 1000,
+      "type": "SECONDARY",
+      "createdAt": "2026-05-01T10:25:00.000Z",
+      "updatedAt": "2026-05-01T10:25:00.000Z"
+    }
+  ]
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to get user trades ! Something went wrong."
+}
+```
 
 ### User balance
 
 - `GET /api/user/balance`
 
-Returns the latest available balance from the ledger.
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "User balance fetched successfully !",
+  "balance": 25000
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to get user balance ! Something went wrong."
+}
+```
 
 ### User portfolio
 
 - `GET /api/user/portfolio`
 
-Returns the user portfolio.
-
-If the user has no portfolio yet, the API returns:
+Example success response with portfolio
 
 ```json
 {
   "success": true,
-  "portfolio": { "stocks": [] }
+  "message": "User portfolio fetched successfully !",
+  "portfolio": {
+    "_id": "66caaaaaaaabbbbbbbbbb",
+    "userId": "66c555555555555555555555",
+    "stocks": [
+      {
+        "stockId": {
+          "_id": "66c111111111111111111111",
+          "symbol": "ABC",
+          "name": "ABC Industries"
+        },
+        "quantity": 10,
+        "averagePrice": 100
+      }
+    ]
+  }
+}
+```
+
+Example success response without portfolio
+
+```json
+{
+  "success": true,
+  "portfolio": {
+    "stocks": []
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to get user portfolio ! Something went wrong."
 }
 ```
 
@@ -252,7 +800,14 @@ If the user has no portfolio yet, the API returns:
 
 - `POST /api/funds/add`
 
-Request body:
+Headers
+
+```http
+Authorization: Bearer <user-token>
+Content-Type: application/json
+```
+
+Request
 
 ```json
 {
@@ -260,13 +815,36 @@ Request body:
 }
 ```
 
-Use this to deposit money into the user ledger before placing buy orders or IPO bids.
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "Funds added successfully !"
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to add funds ! Amount is required."
+}
+```
 
 ### Place buy order
 
 - `POST /api/order/buy`
 
-Request body:
+Headers
+
+```http
+Authorization: Bearer <user-token>
+Content-Type: application/json
+```
+
+Request
 
 ```json
 {
@@ -274,6 +852,37 @@ Request body:
   "quantity": 10,
   "price": 100,
   "category": "LIMIT"
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "Buy order placed successfully !",
+  "order": {
+    "_id": "66c666666666666666666666",
+    "userId": "66c555555555555555555555",
+    "symbol": "ABC",
+    "type": "BUY",
+    "category": "LIMIT",
+    "price": 100,
+    "quantity": 10,
+    "remainingQty": 10,
+    "status": "OPEN",
+    "createdAt": "2026-05-01T10:20:00.000Z",
+    "updatedAt": "2026-05-01T10:20:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to place buy order ! All fields are required."
 }
 ```
 
@@ -286,7 +895,14 @@ Notes:
 
 - `POST /api/order/sell`
 
-Request body:
+Headers
+
+```http
+Authorization: Bearer <user-token>
+Content-Type: application/json
+```
+
+Request
 
 ```json
 {
@@ -294,6 +910,37 @@ Request body:
   "quantity": 10,
   "price": 100,
   "category": "LIMIT"
+}
+```
+
+Example success response
+
+```json
+{
+  "success": true,
+  "message": "Sell order placed successfully !",
+  "order": {
+    "_id": "66c999999999999999999999",
+    "userId": "66c555555555555555555555",
+    "symbol": "ABC",
+    "type": "SELL",
+    "category": "LIMIT",
+    "price": 100,
+    "quantity": 10,
+    "remainingQty": 10,
+    "status": "OPEN",
+    "createdAt": "2026-05-01T10:30:00.000Z",
+    "updatedAt": "2026-05-01T10:30:00.000Z"
+  }
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Unable to place sell order ! All fields are required."
 }
 ```
 
@@ -307,199 +954,273 @@ All routes in this section require:
 
 - `GET /api/company/profile`
 
-Returns:
+Example success response
 
-- company data without password
-- company ledger entries
+```json
+{
+  "success": true,
+  "company": {
+    "_id": "66c222222222222222222222",
+    "name": "ABC Holdings",
+    "symbol": "ABC",
+    "email": "company@example.com",
+    "description": "Optional company description",
+    "createdAt": "2026-05-01T09:00:00.000Z",
+    "updatedAt": "2026-05-01T09:00:00.000Z"
+  },
+  "ledger": [
+    {
+      "_id": "66cb00000000000000000000",
+      "companyId": "66c222222222222222222222",
+      "amount": 0,
+      "type": "FUND",
+      "balanceAfter": 0,
+      "createdAt": "2026-05-01T09:00:00.000Z",
+      "updatedAt": "2026-05-01T09:00:00.000Z"
+    }
+  ]
+}
+```
+
+Example error response
+
+```json
+{
+  "success": false,
+  "message": "Company not found"
+}
+```
 
 ### Company IPOs
 
 - `GET /api/company/ipos`
 
-Returns IPOs created by the company.
+Example success response
+
+```json
+{
+  "success": true,
+  "ipos": [
+    {
+      "_id": "66c333333333333333333333",
+      "stockId": {
+        "_id": "66c111111111111111111111",
+        "name": "ABC Industries",
+        "symbol": "ABC"
+      },
+      "totalShares": 10000,
+      "priceRange": {
+        "min": 90,
+        "max": 110
+      },
+      "lotSize": 10,
+      "status": "OPEN"
+    }
+  ]
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "Internal Server Error"
+}
+```
 
 ### Company trades
 
 - `GET /api/company/trades`
 
-Returns trades associated with the company.
+Example success response
+
+```json
+{
+  "success": true,
+  "trades": [
+    {
+      "_id": "66c777777777777777777777",
+      "buyerId": {
+        "_id": "66c555555555555555555555",
+        "name": "User Name",
+        "email": "user@example.com"
+      },
+      "sellerId": {
+        "_id": "66c222222222222222222222",
+        "name": "ABC Holdings",
+        "email": "company@example.com"
+      },
+      "symbol": "ABC",
+      "price": 100,
+      "quantity": 10,
+      "totalAmount": 1000,
+      "type": "SECONDARY"
+    }
+  ]
+}
+```
+
+Example error response
+
+```json
+{
+  "message": "Internal Server Error"
+}
+```
 
 ### Company stock details
 
 - `GET /api/company/stock-details`
 
-Returns the stock linked to the company symbol.
-
-### Create stock
-
-- `POST /api/stock/create`
-
-Request body:
+Example success response
 
 ```json
 {
-  "name": "ABC Industries",
-  "quantity": 100000
+  "success": true,
+  "stockDetails": {
+    "_id": "66c111111111111111111111",
+    "name": "ABC Industries",
+    "symbol": "ABC",
+    "totalShares": 100000,
+    "issuedShares": 0,
+    "currentPrice": 0,
+    "isListed": false,
+    "isActive": true,
+    "createdBy": "66c222222222222222222222"
+  }
 }
 ```
 
-Notes:
-
-- Symbol comes from the authenticated company record.
-- This route creates the stock only if one with the same symbol does not already exist.
-
-### Get stock by symbol
-
-- `GET /api/stock/:symbol`
-
-Example:
-
-- `GET /api/stock/ABC`
-
-This route is protected by company auth.
-
-### Create IPO
-
-- `POST /api/ipo/create`
-
-Request body:
+Example error response
 
 ```json
 {
-  "stockId": "mongo-id-here",
-  "totalShares": 10000,
-  "priceRange": {
-    "min": 90,
-    "max": 110
-  },
-  "startDate": "2026-05-01T00:00:00.000Z",
-  "endDate": "2026-05-15T00:00:00.000Z",
-  "lotSize": 10
+  "success": false,
+  "message": "Stock details not found for the company"
 }
 ```
-
-Notes:
-
-- The backend also accepts `priceBand` instead of `priceRange`.
-- `lotSize` defaults to `1` if omitted in the controller, though the schema default is `10`.
-- The stock must exist and must not already be listed.
-
-### Close IPO
-
-- `PATCH /api/ipo/:id/close`
-
-Example:
-
-- `PATCH /api/ipo/66c123.../close`
-
-Use this to manually close an IPO if the scheduler does not do it.
-
-## User IPO Action
-
-### Place IPO bid
-
-- `POST /api/ipo/:id/bid`
-
-Headers:
-
-- `Authorization: Bearer <user-token>`
-
-Request body:
-
-```json
-{
-  "quantity": 100,
-  "bidPrice": 95
-}
-```
-
-Notes:
-
-- Quantity must be a multiple of the IPO lot size.
-- Bid price must stay within the IPO price range.
-- The backend checks that the user has enough available balance and locks the bid amount.
 
 ## Important Data Shapes
 
 ### User
 
-- `email`
-- `name`
-- `type`
-- timestamps
+```json
+{
+  "_id": "66c555555555555555555555",
+  "email": "user@example.com",
+  "name": "User Name",
+  "type": "USER",
+  "createdAt": "2026-05-01T09:00:00.000Z",
+  "updatedAt": "2026-05-01T09:00:00.000Z"
+}
+```
 
 ### Company
 
-- `name`
-- `symbol`
-- `email`
-- `description`
-- timestamps
+```json
+{
+  "_id": "66c222222222222222222222",
+  "name": "ABC Holdings",
+  "symbol": "ABC",
+  "email": "company@example.com",
+  "description": "Optional company description",
+  "createdAt": "2026-05-01T09:00:00.000Z",
+  "updatedAt": "2026-05-01T09:00:00.000Z"
+}
+```
 
 ### Stock
 
-- `name`
-- `symbol`
-- `totalShares`
-- `issuedShares`
-- `currentPrice`
-- `isListed`
-- `isActive`
-- `createdBy`
+```json
+{
+  "_id": "66c111111111111111111111",
+  "name": "ABC Industries",
+  "symbol": "ABC",
+  "totalShares": 100000,
+  "issuedShares": 0,
+  "currentPrice": 0,
+  "isListed": false,
+  "isActive": true,
+  "createdBy": "66c222222222222222222222"
+}
+```
 
 ### IPO
 
-- `stockId`
-- `totalShares`
-- `priceRange.min`
-- `priceRange.max`
-- `cutoffPrice`
-- `lotSize`
-- `soldShares`
-- `status`
-- `startDate`
-- `endDate`
-- `createdBy`
+```json
+{
+  "_id": "66c333333333333333333333",
+  "stockId": "66c111111111111111111111",
+  "totalShares": 10000,
+  "priceRange": {
+    "min": 90,
+    "max": 110
+  },
+  "cutoffPrice": null,
+  "lotSize": 10,
+  "soldShares": 0,
+  "status": "OPEN",
+  "startDate": "2026-05-01T00:00:00.000Z",
+  "endDate": "2026-05-15T00:00:00.000Z",
+  "createdBy": "66c222222222222222222222"
+}
+```
 
 ### Order
 
-- `userId`
-- `symbol`
-- `type` as `BUY` or `SELL`
-- `category` as `LIMIT` or `MARKET`
-- `price`
-- `quantity`
-- `remainingQty`
-- `status`
+```json
+{
+  "_id": "66c666666666666666666666",
+  "userId": "66c555555555555555555555",
+  "symbol": "ABC",
+  "type": "BUY",
+  "category": "LIMIT",
+  "price": 100,
+  "quantity": 10,
+  "remainingQty": 10,
+  "status": "OPEN"
+}
+```
 
 ### Trade
 
-- `buyerId`
-- `sellerId`
-- `buyOrderId`
-- `sellOrderId`
-- `bidId`
-- `symbol`
-- `price`
-- `quantity`
-- `totalAmount`
-- `type` as `SECONDARY` or `IPO`
+```json
+{
+  "_id": "66c777777777777777777777",
+  "buyerId": "66c555555555555555555555",
+  "sellerId": "66c888888888888888888888",
+  "buyOrderId": "66c666666666666666666666",
+  "sellOrderId": "66c999999999999999999999",
+  "bidId": "66c444444444444444444444",
+  "symbol": "ABC",
+  "price": 100,
+  "quantity": 10,
+  "totalAmount": 1000,
+  "type": "SECONDARY"
+}
+```
 
 ### Ledger
 
-- `userId` or `companyId`
-- `symbol`
-- `quantity`
-- `price`
-- `amount`
-- `type`
-- `balanceAfter`
-- `referenceId`
-- `referenceModel`
+```json
+{
+  "_id": "66cb00000000000000000000",
+  "userId": "66c555555555555555555555",
+  "companyId": null,
+  "symbol": "ABC",
+  "quantity": 10,
+  "price": 100,
+  "amount": 1000,
+  "type": "LOCK",
+  "balanceAfter": 15000,
+  "referenceId": "66c444444444444444444444",
+  "referenceModel": "Bid"
+}
+```
 
 ## Frontend Integration Notes
 
 - Store the JWT after login and attach it to protected requests.
-- Use separate auth state for users and companies because the backend has distinct auth routes and middleware.
-- For buy/sell and IPO bid flows, refresh balance, portfolio, orders, and trades after a successful mutation.
-- If the API returns a 401, clear local auth state and route the user back to login.
+- Keep user auth state and company auth state separate.
+- After buy, sell, add funds, IPO bid, and IPO close actions, refresh the views that depend on balance, portfolio, orders, trades, or IPO state.
+- If the API returns a 401, clear local auth state and route the user back to the appropriate login screen.
