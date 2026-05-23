@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../app/api';
 
 const Register = () => {
   const location = useLocation();
@@ -51,10 +51,7 @@ const Register = () => {
               password: formData.password,
             };
 
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}${endpoint}`,
-        payload
-      );
+      const res = await api.post(endpoint, payload);
 
       console.log(res.data);
 

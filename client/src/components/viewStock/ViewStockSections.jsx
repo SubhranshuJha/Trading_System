@@ -1,0 +1,30 @@
+import {
+  Activity,
+  ArrowUpRight,
+  BarChart3,
+  Building2,
+  CandlestickChart,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+
+export const ViewStockHero = ({
+  company,
+  stock,
+}) => (
+  <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-[#081225] to-[#0f172a] p-6 sm:p-8"><div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-center gap-5"><div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-cyan-500/10 ring-4 ring-cyan-500/10"><Building2 size={42} className="text-cyan-300" /></div><div><div className="flex flex-wrap items-center gap-3"><h1 className="text-4xl font-bold tracking-tight">{company.name}</h1><div className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-300">{company.symbol}</div></div><p className="mt-2 text-sm text-slate-400">{company.sector}</p><div className="mt-4 flex items-center gap-4"><h2 className="text-5xl font-bold">₹{stock.price}</h2><div className="rounded-xl bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-400">{stock.change}</div></div></div></div><div className="grid grid-cols-2 gap-4 sm:w-[420px]"><div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Market Cap</p><h2 className="mt-2 text-2xl font-bold">{company.marketCap}</h2></div><div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-sm text-slate-500">Investors</p><h2 className="mt-2 text-2xl font-bold">{company.investors}</h2></div></div></div></div>
+);
+
+export const ViewStockLeft = ({
+  stock,
+  recentTrades,
+}) => (
+  <div className="space-y-6 lg:col-span-8"><div className="rounded-3xl border border-slate-800 bg-[#081225] p-6"><div className="flex items-center justify-between"><div><h2 className="text-2xl font-bold">Stock Performance</h2><p className="mt-1 text-sm text-slate-500">Real-time price movement</p></div><div className="rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-400">{stock.marketStatus}</div></div><div className="mt-6 flex h-[350px] items-center justify-center rounded-3xl border border-slate-800 bg-slate-900/40"><div className="text-center"><CandlestickChart size={56} className="mx-auto text-cyan-300" /><p className="mt-4 text-lg font-semibold">Stock Chart Area</p><p className="mt-2 text-sm text-slate-500">Integrate TradingView or Recharts</p></div></div></div><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[{k:'Open',v:stock.open},{k:'High',v:stock.high,c:'text-green-400'},{k:'Low',v:stock.low,c:'text-red-400'},{k:'Volume',v:stock.volume}].map((it)=><div key={it.k} className="rounded-3xl border border-slate-800 bg-[#081225] p-5"><p className="text-sm text-slate-500">{it.k}</p><h2 className={`mt-2 text-2xl font-bold ${it.c || ''}`}>₹{it.v}</h2></div>)}</div><div className="overflow-hidden rounded-3xl border border-slate-800 bg-[#081225]"><div className="border-b border-slate-800 px-6 py-5"><h2 className="text-2xl font-bold">Recent Trades</h2></div><div className="divide-y divide-slate-800">{recentTrades.map((trade, index) => (<div key={index} className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex items-center gap-3"><div className={`rounded-full px-3 py-1 text-xs font-medium ${trade.type === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>{trade.type}</div><h3 className="font-semibold">{trade.quantity} Shares</h3></div><p className="mt-2 text-sm text-slate-500">{trade.time}</p></div><div className="text-right"><p className="text-sm text-slate-500">Trade Price</p><h3 className="mt-1 text-xl font-bold">₹{trade.price}</h3></div></div>))}</div></div></div>
+);
+
+export const ViewStockRight = ({
+  company,
+  stock,
+}) => (
+  <div className="space-y-6 lg:col-span-4"><div className="rounded-3xl border border-slate-800 bg-[#081225] p-6"><h2 className="text-xl font-semibold">Company Information</h2><div className="mt-6 space-y-5">{[{k:'Company Name',v:company.name},{k:'Stock Symbol',v:company.symbol},{k:'Sector',v:company.sector},{k:'Market Status',v:stock.marketStatus,c:'text-green-400'}].map((it)=><div key={it.k}><p className="text-sm text-slate-500">{it.k}</p><h3 className={`mt-1 font-medium ${it.c || ''}`}>{it.v}</h3></div>)}</div></div><div className="rounded-3xl border border-slate-800 bg-[#081225] p-6"><div className="flex items-center gap-3"><BarChart3 size={22} className="text-cyan-300" /><h2 className="text-xl font-semibold">Market Insights</h2></div><div className="mt-6 space-y-5">{[{t:'Investor Interest',v:'82%',w:'82%',c:'bg-cyan-400'},{t:'Market Activity',v:'71%',w:'71%',c:'bg-green-400'},{t:'Buy Sentiment',v:'64%',w:'64%',c:'bg-purple-400'}].map((item)=><div key={item.t}><div className="flex items-center justify-between"><p className="text-sm text-slate-500">{item.t}</p><p className="font-semibold">{item.v}</p></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800"><div style={{width:item.w}} className={`h-full rounded-full ${item.c}`}></div></div></div>)}</div></div><div className="rounded-3xl border border-slate-800 bg-[#081225] p-6"><h2 className="text-xl font-semibold">Quick Actions</h2><div className="mt-6 space-y-4">{[{t:'Buy Stock',d:'Open trading panel',i:<TrendingUp size={20} className="text-cyan-300" />},{t:'View Trades',d:'Open trade history',i:<Activity size={20} className="text-cyan-300" />},{t:'Investors',d:'Investor participation',i:<Users size={20} className="text-cyan-300" />},{t:'Public Page',d:'Open public company profile',i:<ArrowUpRight size={20} className="text-cyan-300" />}].map((a)=><button key={a.t} className="flex w-full items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 transition hover:border-cyan-400/30"><div className="rounded-xl bg-cyan-500/10 p-3">{a.i}</div><div className="text-left"><h3 className="font-medium">{a.t}</h3><p className="mt-1 text-xs text-slate-500">{a.d}</p></div></button>)}</div></div></div>
+);

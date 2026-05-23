@@ -3,9 +3,11 @@ import { useSelector } from 'react-redux';
 import { CandlestickChart } from 'lucide-react';
 
 const NavBar = () => {
-  const { isAuthenticated, role } = useSelector(
+  const { isAuthenticated, role, token } = useSelector(
     (state) => state.auth
   );
+  const hasSession =
+    isAuthenticated && Boolean(token) && Boolean(role);
 
   const navLinkClass = ({ isActive }) =>
     `transition text-sm font-medium ${
@@ -83,21 +85,21 @@ const NavBar = () => {
           {isAuthenticated && role === 'company' && (
             <>
               <NavLink
-                to="/company/dashboard"
+                to="/company-profile"
                 className={navLinkClass}
               >
                 Dashboard
               </NavLink>
 
               <NavLink
-                to="/company/ipos"
+                to="/company/ipo"
                 className={navLinkClass}
               >
                 IPOs
               </NavLink>
 
               <NavLink
-                to="/company/trades"
+                to="/company/stock"
                 className={navLinkClass}
               >
                 Trades
@@ -109,13 +111,13 @@ const NavBar = () => {
         {/* RIGHT SECTION */}
         <div className="flex items-center gap-3">
           
-          {!isAuthenticated ? (
+          {!hasSession ? (
             <>
               <Link
                 to="/login/user"
                 className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-cyan-500 hover:text-cyan-300"
               >
-                Login
+                Sign In
               </Link>
 
               <Link
@@ -129,8 +131,8 @@ const NavBar = () => {
             <Link
               to={
                 role === 'company'
-                  ? '/company/dashboard'
-                  : '/profile'
+                  ? '/company-profile'
+                  : '/user-profile'
               }
               className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 transition hover:border-cyan-500/40"
             >

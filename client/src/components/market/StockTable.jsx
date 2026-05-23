@@ -1,62 +1,10 @@
 import StockRow from './StockRow';
 
-const dummyStocks = [
-  {
-    _id: 1,
-    symbol: 'RELIANCE',
-    companyName: 'Reliance Industries',
-    price: 2943,
-    change: 2.14,
-    volume: '18.2M',
-  },
-
-  {
-    _id: 2,
-    symbol: 'INFY',
-    companyName: 'Infosys',
-    price: 1812,
-    change: -1.08,
-    volume: '9.4M',
-  },
-
-  {
-    _id: 3,
-    symbol: 'TCS',
-    companyName: 'Tata Consultancy',
-    price: 4120,
-    change: 0.84,
-    volume: '6.1M',
-  },
-
-  {
-    _id: 4,
-    symbol: 'HDFC',
-    companyName: 'HDFC Bank',
-    price: 1650,
-    change: -0.32,
-    volume: '12.7M',
-  },
-
-  {
-    _id: 5,
-    symbol: 'SBIN',
-    companyName: 'State Bank of India',
-    price: 812,
-    change: 1.56,
-    volume: '21.5M',
-  },
-
-  {
-    _id: 6,
-    symbol: 'ADANIENT',
-    companyName: 'Adani Enterprises',
-    price: 3021,
-    change: -2.48,
-    volume: '14.8M',
-  },
-];
-
-const StockTable = () => {
+const StockTable = ({
+  stocks = [],
+  loading = false,
+  error = '',
+}) => {
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/70">
       
@@ -82,12 +30,29 @@ const StockTable = () => {
       </div>
 
       {/* ROWS */}
-      {dummyStocks.map((stock) => (
-        <StockRow
-          key={stock._id}
-          stock={stock}
-        />
-      ))}
+      {loading ? (
+        <p className="px-6 py-10 text-center text-slate-400">
+          Loading stocks...
+        </p>
+      ) : null}
+      {!loading && error ? (
+        <p className="px-6 py-10 text-center text-red-400">
+          {error}
+        </p>
+      ) : null}
+      {!loading && !error && stocks.length === 0 ? (
+        <p className="px-6 py-10 text-center text-slate-400">
+          No stocks found
+        </p>
+      ) : null}
+      {!loading && !error
+        ? stocks.map((stock) => (
+            <StockRow
+              key={stock._id}
+              stock={stock}
+            />
+          ))
+        : null}
     </div>
   );
 };

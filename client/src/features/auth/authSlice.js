@@ -2,10 +2,17 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   user: null,
-  token: localStorage.getItem('token') || null,
+  token:
+    localStorage.getItem('userToken') ||
+    localStorage.getItem('companyToken') ||
+    localStorage.getItem('token') ||
+    null,
   role: localStorage.getItem('role') || null,
-  // isAuthenticated: !!localStorage.getItem('token'),
-  isAuthenticated: false,
+  isAuthenticated: !!(
+    localStorage.getItem('userToken') ||
+    localStorage.getItem('companyToken') ||
+    localStorage.getItem('token')
+  ),
 };
 
 const authSlice = createSlice({
@@ -20,6 +27,7 @@ const authSlice = createSlice({
       state.role = 'user';
       state.isAuthenticated = true;
 
+      localStorage.setItem('userToken', action.payload.token);
       localStorage.setItem('token', action.payload.token);
       localStorage.setItem('role', 'user');
     },
@@ -30,6 +38,10 @@ const authSlice = createSlice({
       state.role = 'company';
       state.isAuthenticated = true;
 
+      localStorage.setItem(
+        'companyToken',
+        action.payload.token
+      );
       localStorage.setItem('token', action.payload.token);
       localStorage.setItem('role', 'company');
     },
@@ -40,6 +52,7 @@ const authSlice = createSlice({
       state.role = null;
       state.isAuthenticated = false;
 
+      localStorage.removeItem('userToken');
       localStorage.removeItem('token');
       localStorage.removeItem('role');
     },
@@ -50,6 +63,7 @@ const authSlice = createSlice({
       state.role = null;
       state.isAuthenticated = false;
 
+      localStorage.removeItem('companyToken');
       localStorage.removeItem('token');
       localStorage.removeItem('role');
     },
