@@ -46,17 +46,36 @@ const CompanyProfile = () => {
       try {
         setLoading(true);
         setError('');
-        const [profileRes, stockRes, tradesRes, ipoRes] = await Promise.all([
+        const [profileRes, stockRes, tradesRes, ipoRes] = await Promise.allSettled([
           api.get('/api/company/profile'),
           api.get('/api/company/stock-details'),
           api.get('/api/company/trades'),
           api.get('/api/company/ipos'),
         ]);
 
-        const profile = profileRes.data.company || {};
-        const stockDetails = stockRes.data.stockDetails || {};
-        const companyTrades = tradesRes.data.trades || [];
-        const companyIpos = ipoRes.data.ipos || [];
+        if (profileRes.status === 'rejected') {
+          throw profileRes.reason;
+        }
+
+        if (tradesRes.status === 'rejected') {
+          throw tradesRes.reason;
+        }
+
+        if (ipoRes.status === 'rejected') {
+          throw ipoRes.reason;
+        }
+
+        const profile = profileRes.value.data.company || {};
+        const companyTrades = tradesRes.value.data.trades || [];
+        const companyIpos = ipoRes.value.data.ipos || [];
+        const stockDetails =
+          stockRes.status === 'fulfilled'
+            ? stockRes.value.data.stockDetails || {}
+            : stockRes.reason?.response?.status === 404
+              ? {}
+              : (() => {
+                  throw stockRes.reason;
+                })();
         const latestIpo = companyIpos[0];
 
         setCompany({

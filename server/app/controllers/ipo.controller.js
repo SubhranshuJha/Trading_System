@@ -64,7 +64,7 @@ const createIPO = async (req, res) => {
 
     } catch (err) {
         console.log("ISE > CREATE IPO:", err.message);
-        res.status(500).json({ "ISE > CREATE IPO": err.message });
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 

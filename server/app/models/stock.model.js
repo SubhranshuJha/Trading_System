@@ -52,7 +52,5 @@ const stockSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-stockSchema.index({ symbol: 1 });
-
 const stockModel = mongoose.model("Stock", stockSchema);
 export default stockModel;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../app/api';
+import { getSocket } from '../app/socket';
 import NavBar from '../components/NavBar';
 
 const Orders = () => {
@@ -7,23 +8,40 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const { data } = await api.get('/api/user/orders');
+      setOrders(data.orders || []);
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message || 'Unable to load orders'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        setError('');
-        const { data } = await api.get('/api/user/orders');
-        setOrders(data.orders || []);
-      } catch (requestError) {
-        setError(
-          requestError.response?.data?.message ||
-            'Unable to load orders'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const socket = getSocket();
+    socket.connect();
+
+    const handleOrderUpdate = () => {
+      fetchOrders();
+    };
+
+    socket.on('market:order-updated', handleOrderUpdate);
+    socket.on('market:trade-executed', handleOrderUpdate);
+
+    return () => {
+      socket.off('market:order-updated', handleOrderUpdate);
+      socket.off('market:trade-executed', handleOrderUpdate);
+    };
   }, []);
 
   return (
@@ -35,9 +53,17 @@ const Orders = () => {
         {!loading && error ? <p className="mt-6 text-red-400">{error}</p> : null}
         <div className="mt-6 space-y-3">
           {orders.map((order) => (
-            <div key={order._id} className="rounded-xl border border-slate-800 bg-[#081225] p-4">
-              <p className="font-semibold">{order.type} {order.symbol}</p>
-              <p className="text-sm text-slate-400">Qty: {order.quantity} | Price: ₹{order.price} | Status: {order.status}</p>
+            <div
+              key={order._id}
+              className="rounded-xl border border-slate-800 bg-[#081225] p-4"
+            >
+              <p className="font-semibold">
+                {order.type} {order.symbol}
+              </p>
+              <p className="text-sm text-slate-400">
+                Qty: {order.quantity} | Remaining: {order.remainingQty} | Price:
+                ₹{order.price} | Status: {order.status}
+              </p>
             </div>
           ))}
         </div>

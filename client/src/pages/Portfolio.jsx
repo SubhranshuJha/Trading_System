@@ -38,7 +38,7 @@ const Portfolio = () => {
           {stocks.map((stock) => (
             <div key={stock.stockId?._id || stock.stockId?.symbol} className="rounded-xl border border-slate-800 bg-[#081225] p-4">
               <p className="font-semibold">{stock.stockId?.symbol} - {stock.stockId?.name}</p>
-              <p className="text-sm text-slate-400">Qty: {stock.quantity} | Avg: ₹{stock.averagePrice}</p>
+              <p className="text-sm text-slate-400">Qty: {stock.quantity} | Avg: ₹{stock.averagePrice ?? 0}</p>
             </div>
           ))}
         </div>

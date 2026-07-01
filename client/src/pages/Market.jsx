@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
 import api from '../app/api';
+import { getSocket } from '../app/socket';
 
 import MarketHeader from '../components/market/MarketHeader';
 import MarketStats from '../components/market/MarketStats';
 import StockTable from '../components/market/StockTable';
-import MarketSidebar from '../components/market/MarketSidebar';
+import MarketSidebar from '../components/market/MarketSideBar';
 
 const Market = () => {
   const [stocks, setStocks] = useState([]);
@@ -29,6 +30,28 @@ const Market = () => {
     };
 
     fetchStocks();
+  }, []);
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    socket.connect();
+
+    const handleStockUpdate = (updatedStock) => {
+      setStocks((currentStocks) =>
+        currentStocks.map((stock) =>
+          stock._id === updatedStock._id || stock.symbol === updatedStock.symbol
+            ? { ...stock, ...updatedStock }
+            : stock
+        )
+      );
+    };
+
+    socket.on('market:stock-updated', handleStockUpdate);
+
+    return () => {
+      socket.off('market:stock-updated', handleStockUpdate);
+    };
   }, []);
 
   return (

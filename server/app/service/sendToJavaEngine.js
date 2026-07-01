@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const ENGINE_URL = process.env.JAVA_ENGINE_URL || "http://localhost:8080";
+
 export const sendToJavaEngine = async (order) => {
     try {
 
-        const response = await axios.post("http://localhost:8080/orders", {
+        const response = await axios.post(`${ENGINE_URL}/orders`, {
             id: order._id || Date.now().toString(),
             symbol: order.symbol,
             userId: order.userId,

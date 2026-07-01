@@ -10,10 +10,10 @@ import model.OrderCategory;
 
 public class ExchangeService {
 
-    HashMap<String, OrderBook> orderBooks = new HashMap<>();
-    MatchingEngine matchingEngine = new MatchingEngine();
+    private final HashMap<String, OrderBook> orderBooks = new HashMap<>();
+    private final MatchingEngine matchingEngine = new MatchingEngine();
 
-    public List<Trade> placeOrder(Order order) {
+    public List<Trade> placeOrderInternal(Order order) {
         orderBooks.putIfAbsent(order.getSymbol(), new OrderBook());
         OrderBook ob = orderBooks.get(order.getSymbol());
 
@@ -35,4 +35,11 @@ public class ExchangeService {
         return orderBooks;
     }
 
+    public void restoreOrderBook(String symbol, OrderBook orderBook) {
+        orderBooks.put(symbol.toUpperCase(Locale.ROOT), orderBook);
+    }
+
+    public void clearAll() {
+        orderBooks.clear();
+    }
 }

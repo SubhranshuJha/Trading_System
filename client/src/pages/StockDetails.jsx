@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import api from '../app/api';
+import { getSocket } from '../app/socket';
 import StockHeader from '../components/stockDetails/StockHeader';
 import StockTabs from '../components/stockDetails/StockTabs';
 import PriceChart from '../components/stockDetails/PriceChart';
@@ -21,11 +22,8 @@ const StockDetails = () => {
       try {
         setLoading(true);
         setError('');
-        const { data } = await api.get('/api/stock/all');
-        const foundStock = (data.data || []).find(
-          (item) => item.symbol === symbol
-        );
-        setStock(foundStock || null);
+        const { data } = await api.get(`/api/stock/symbol/${symbol}`);
+        setStock(data.data || null);
       } catch (requestError) {
         setError(
           requestError.response?.data?.message ||
@@ -37,6 +35,26 @@ const StockDetails = () => {
     };
 
     fetchStock();
+  }, [symbol]);
+
+  useEffect(() => {
+    const socket = getSocket();
+
+    socket.connect();
+
+    const handleStockUpdate = (updatedStock) => {
+      if (updatedStock?.symbol === symbol) {
+        setStock((currentStock) =>
+          currentStock ? { ...currentStock, ...updatedStock } : updatedStock
+        );
+      }
+    };
+
+    socket.on('market:stock-updated', handleStockUpdate);
+
+    return () => {
+      socket.off('market:stock-updated', handleStockUpdate);
+    };
   }, [symbol]);
 
   const viewStock = stock
@@ -89,7 +107,7 @@ const StockDetails = () => {
                   <>
                     <PriceChart />
                     <StockStats stock={viewStock} />
-                    <RecentTrades />
+                    <RecentTrades symbol={viewStock.symbol} />
                   </>
                 ) : null}
               </div>

@@ -8,7 +8,7 @@ public class Main {
         ExchangeService exchange = new ExchangeService();
 
         // BUY limit order
-        exchange.placeOrder(new Order(
+        exchange.placeOrderInternal(new Order(
                 "1",
                 "TATA",
                 "u1",
@@ -19,7 +19,7 @@ public class Main {
         ));
 
         // SELL limit order
-        exchange.placeOrder(new Order(
+        exchange.placeOrderInternal(new Order(
                 "2",
                 "TATA",
                 "u2",
@@ -30,7 +30,7 @@ public class Main {
         ));
 
         // Another SELL limit order
-        exchange.placeOrder(new Order(
+        exchange.placeOrderInternal(new Order(
                 "3",
                 "TATA",
                 "u3",

@@ -50,9 +50,10 @@ const getCompanyStockDetails = async (req, res) => {
         
         const data = await stockModel.findOne({ symbol: companyData.symbol });
         if (!data) {
-            return res.status(404).json({
-                success: false,
-                message: "Stock details not found for the company"
+            return res.status(200).json({
+                success: true,
+                stockDetails: null,
+                message: "No stock details found for this company yet"
             });
         }
 

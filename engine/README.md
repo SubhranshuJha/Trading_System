@@ -213,7 +213,8 @@ SELL → empty
 ### 1. Compile
 
 ```bash
-javac *.java
+cd src
+javac EngineHttpServer.java Main.java model/*.java service/*.java
 ```
 
 ---
@@ -221,14 +222,77 @@ javac *.java
 ### 2. Run Server
 
 ```bash
+cd src
 java EngineHttpServer
 ```
+
+Optional arguments:
+
+```bash
+java EngineHttpServer 8080 ./data
+```
+
+- `8080` → HTTP port
+- `./data` → persistence directory for WAL + snapshots
 
 Server starts at:
 
 ```text
 http://localhost:8080
 ```
+
+---
+
+## 💾 Persistence and Recovery
+
+The engine now writes durable logs so in-memory order books can be rebuilt after a crash.
+
+### Files (inside `data/` by default)
+
+| File | Purpose |
+| ---- | ------- |
+| `engine-wal.log` | Append-only event log (`ORDER_SUBMIT`, `TRADE_EXECUTED`, `ORDER_RESTED`) |
+| `engine-snapshot.json` | Periodic checkpoint of all resting limit orders |
+
+### Recovery flow on startup
+
+1. Load the latest `engine-snapshot.json` (if present)
+2. Replay `ORDER_SUBMIT` events from `engine-wal.log` with `seq > lastAppliedSeq`
+3. Skip duplicate order IDs already present in the book
+
+### Extra endpoints
+
+```http
+GET /persistence/status
+```
+
+Returns current sequence number and a live snapshot.
+
+```http
+POST /recover
+```
+
+Replays open limit orders sent from the Node server (MongoDB backup recovery).
+
+Example body:
+
+```json
+{
+  "orders": [
+    {
+      "id": "665f...",
+      "symbol": "TATA",
+      "userId": "u1",
+      "type": "BUY",
+      "category": "LIMIT",
+      "price": 100,
+      "quantity": 5
+    }
+  ]
+}
+```
+
+The Node server automatically calls `/recover` on startup for `OPEN`/`PARTIAL` limit orders still in MongoDB.
 
 ---
 

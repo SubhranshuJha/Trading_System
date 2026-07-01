@@ -125,6 +125,15 @@ const App = () => {
           }
         />
 
+        <Route
+          path="/company/ipo/create"
+          element={
+            <ProtectedRoute role="company">
+              <ManageIPO />
+            </ProtectedRoute>
+          }
+        />
+
 
 
       </Routes>

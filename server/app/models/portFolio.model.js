@@ -30,6 +30,11 @@ const portfolioSchema = new mongoose.Schema({
       locked: {
         type: Number,
         default: 0
+      },
+
+      averagePrice: {
+        type: Number,
+        default: 0
       }
     }
   ]

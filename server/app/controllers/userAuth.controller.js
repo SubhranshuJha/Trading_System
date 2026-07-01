@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import userModel from "../models/user.model.js";
+import portfolioModel from "../models/portFolio.model.js";
 import blackListToken from "../models/blackListToken.model.js";
 import generateToken from "../utils/generateToken.js";
 
@@ -9,7 +10,7 @@ const registerUser = async (req, res) => {
     
     try {
 
-        const { email , name , password , type } = req.body;
+        const { email , name , password } = req.body;
 
         if ( !email || !name || !password ) {
             return res.status(400).json ( {
@@ -44,8 +45,12 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const userData = new userModel ( { email, name, password: hashedPassword } );
-        userData.type = type === "COMPANY" ? "COMPANY" : "USER"; 
         await userData.save();
+
+        await portfolioModel.create({
+            userId: userData._id,
+            stocks: [],
+        });
 
         return res.status(201).json ( {
             success: true,

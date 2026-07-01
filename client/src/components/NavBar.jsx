@@ -1,8 +1,12 @@
-import { Link, NavLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { CandlestickChart } from 'lucide-react';
+import api from '../app/api';
+import { logoutCompany, logoutUser } from '../features/auth/authSlice';
 
 const NavBar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isAuthenticated, role, token } = useSelector(
     (state) => state.auth
   );
@@ -15,6 +19,26 @@ const NavBar = () => {
         ? 'text-cyan-400'
         : 'text-slate-300 hover:text-cyan-300'
     }`;
+
+  const handleLogout = async () => {
+    try {
+      const endpoint =
+        role === 'company'
+          ? '/api/auth-company/logout'
+          : '/api/auth-user/logout';
+      await api.post(endpoint);
+    } catch {
+      // Clear local session even if logout API fails.
+    }
+
+    if (role === 'company') {
+      dispatch(logoutCompany());
+    } else {
+      dispatch(logoutUser());
+    }
+
+    navigate('/');
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur-xl">
@@ -128,32 +152,40 @@ const NavBar = () => {
               </Link>
             </>
           ) : (
-            <Link
-              to={
-                role === 'company'
-                  ? '/company-profile'
-                  : '/user-profile'
-              }
-              className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 transition hover:border-cyan-500/40"
-            >
-              {/* AVATAR */}
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500 font-bold text-slate-950">
-                {role === 'company' ? 'C' : 'U'}
-              </div>
+            <>
+              <Link
+                to={
+                  role === 'company'
+                    ? '/company-profile'
+                    : '/user-profile'
+                }
+                className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 transition hover:border-cyan-500/40"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500 font-bold text-slate-950">
+                  {role === 'company' ? 'C' : 'U'}
+                </div>
 
-              {/* ACCOUNT INFO */}
-              <div className="hidden text-left md:block">
-                <p className="text-sm font-medium text-slate-200">
-                  My Account
-                </p>
+                <div className="hidden text-left md:block">
+                  <p className="text-sm font-medium text-slate-200">
+                    My Account
+                  </p>
 
-                <p className="text-xs text-slate-500">
-                  {role === 'company'
-                    ? 'Company Dashboard'
-                    : 'Trader Dashboard'}
-                </p>
-              </div>
-            </Link>
+                  <p className="text-xs text-slate-500">
+                    {role === 'company'
+                      ? 'Company Dashboard'
+                      : 'Trader Dashboard'}
+                  </p>
+                </div>
+              </Link>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-red-500/40 hover:text-red-300"
+              >
+                Logout
+              </button>
+            </>
           )}
         </div>
       </div>

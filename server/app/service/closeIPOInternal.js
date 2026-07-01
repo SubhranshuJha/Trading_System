@@ -213,6 +213,7 @@ const closeIPOInternal = async (ipoId) => {
                 }
 
                 stockEntry.quantity += bid.allocatedQuantity;
+                stockEntry.averagePrice = settlementPrice;
 
                 await portfolio.save({ session });
 

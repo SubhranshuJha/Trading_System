@@ -6,6 +6,7 @@ const stockRouter = express.Router();
 
 stockRouter.post('/create', companyAuthMiddleware,createStock);
 stockRouter.get('/all', getAllStocks);
+stockRouter.get('/symbol/:symbol', getStockBySymbol);
 stockRouter.get('/:symbol', companyAuthMiddleware, getStockBySymbol);
 
 

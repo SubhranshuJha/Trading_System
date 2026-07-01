@@ -1,18 +1,27 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const storedRole = localStorage.getItem('role');
+const storedUserToken = localStorage.getItem('userToken');
+const storedCompanyToken = localStorage.getItem('companyToken');
+const legacyToken = localStorage.getItem('token');
+
+const resolveInitialToken = () => {
+  if (storedRole === 'company') {
+    return storedCompanyToken || legacyToken || null;
+  }
+
+  if (storedRole === 'user') {
+    return storedUserToken || legacyToken || null;
+  }
+
+  return storedUserToken || storedCompanyToken || legacyToken || null;
+};
+
 const initialState = {
   user: null,
-  token:
-    localStorage.getItem('userToken') ||
-    localStorage.getItem('companyToken') ||
-    localStorage.getItem('token') ||
-    null,
-  role: localStorage.getItem('role') || null,
-  isAuthenticated: !!(
-    localStorage.getItem('userToken') ||
-    localStorage.getItem('companyToken') ||
-    localStorage.getItem('token')
-  ),
+  token: resolveInitialToken(),
+  role: storedRole || null,
+  isAuthenticated: Boolean(resolveInitialToken()),
 };
 
 const authSlice = createSlice({
@@ -27,6 +36,7 @@ const authSlice = createSlice({
       state.role = 'user';
       state.isAuthenticated = true;
 
+      localStorage.removeItem('companyToken');
       localStorage.setItem('userToken', action.payload.token);
       localStorage.setItem('token', action.payload.token);
       localStorage.setItem('role', 'user');
@@ -38,6 +48,7 @@ const authSlice = createSlice({
       state.role = 'company';
       state.isAuthenticated = true;
 
+      localStorage.removeItem('userToken');
       localStorage.setItem(
         'companyToken',
         action.payload.token
@@ -53,6 +64,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
 
       localStorage.removeItem('userToken');
+      localStorage.removeItem('companyToken');
       localStorage.removeItem('token');
       localStorage.removeItem('role');
     },
@@ -63,6 +75,7 @@ const authSlice = createSlice({
       state.role = null;
       state.isAuthenticated = false;
 
+      localStorage.removeItem('userToken');
       localStorage.removeItem('companyToken');
       localStorage.removeItem('token');
       localStorage.removeItem('role');
